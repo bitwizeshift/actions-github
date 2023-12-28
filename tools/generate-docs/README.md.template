@@ -1,0 +1,22 @@
+# `actions-github`
+
+This repository provides easy-to-use [composite actions] for managing a Github
+repository in [Github workflows]. All actions wrap the [octokit api] via
+[`actions/github-script`][github-script].
+
+## Available Actions
+
+Below are the list of available actions, with links to documentation:
+
+{{.ActionTable}}
+## License
+
+Except where otherwise specified, this project is dual-licensed under both the
+[Apache-2] and [MIT] licenses.
+
+[Apache-2]: https://opensource.org/license/apache-2-0/
+[MIT]: http://opensource.org/licenses/MIT/
+[composite actions]: https://docs.github.com/en/actions/creating-actions/creating-a-composite-action
+[octokit api]: https://octokit.github.io/rest.js/v20
+[Github workflows]: https://docs.github.com/en/actions/using-workflows
+[github-script]: https://github.com/actions/github-script
