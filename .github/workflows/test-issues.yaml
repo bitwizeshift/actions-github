@@ -1,0 +1,74 @@
+name: Test issues
+on:
+  push:
+    branches: master
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    name: Test issues API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create issue
+        id: create-issue
+        uses: ./issues/create
+        with:
+          title: "Workflow '${{ github.workflow }}' run ${{ github.run_id }}"
+          body: |
+            This is a test Github Issue initiated by [this workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            Please ignore this
+          labels: |
+            integration-test
+            ignore
+          assignees: |
+            bitwizeshift
+      - name: Create comment
+        id: create-comment
+        uses: ./issues/create-comment
+        with:
+          issue-number: ${{ steps.create-issue.outputs.issue-number }}
+          body: |
+            Testing creating an automated comment on the issue
+      - name: Update comment
+        uses: ./issues/update-comment
+        with:
+          comment-id: ${{ steps.create-comment.outputs.comment-id }}
+          body: |
+            Testing creating an automated comment on the issue
+
+            This comment's url: ${{ steps.create-comment.outputs.comment-url }}
+      - name: Add assignees
+        uses: ./issues/add-assignees
+        with:
+          issue-number: ${{ steps.create-issue.outputs.issue-number }}
+          assignees: |
+            octocat
+      - name: Lock issue
+        uses: ./issues/lock
+        with:
+          issue-number: ${{ steps.create-issue.outputs.issue-number }}
+          lock-reason: spam
+      - name: Unlock issue
+        uses: ./issues/unlock
+        with:
+          issue-number: ${{ steps.create-issue.outputs.issue-number }}
+      - name: Close Issue
+        uses: ./issues/close
+        with:
+          issue-number: ${{ steps.create-issue.outputs.issue-number }}
+      - name: Add labels
+        uses: ./issues/add-labels
+        with:
+          issue-number: ${{ steps.create-issue.outputs.issue-number }}
+          labels: |
+            integration-test-complete
