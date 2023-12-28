@@ -28,6 +28,7 @@ jobs:
             This is a test Github Issue initiated by [this workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
             Please ignore this
           labels: |
+            integration-test-started
             integration-test
             ignore
           assignees: |
@@ -66,6 +67,17 @@ jobs:
         uses: ./issues/close
         with:
           issue-number: ${{ steps.create-issue.outputs.issue-number }}
+      - name: Remove assignees
+        uses: ./issues/remove-assignees
+        with:
+          issue-number: ${{ steps.create-issue.outputs.issue-number }}
+          assignees: bitwizeshift
+      - name: Remove labels
+        uses: ./issues/remove-labels
+        with:
+          issue-number: ${{ steps.create-issue.outputs.issue-number }}
+          labels: |
+            integration-test-started
       - name: Add labels
         uses: ./issues/add-labels
         with:

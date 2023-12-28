@@ -1,7 +1,7 @@
 name: Create a release
 description: |
   A composite action that creates a comment on Github.
-  Requires the `issues: write` permission to work.
+  Requires the `contents: write` permission to work.
 
 inputs:
   tag-name:
