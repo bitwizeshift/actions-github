@@ -1,0 +1,63 @@
+name: Test Release
+on:
+  push:
+    branches: master
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    name: Test issues API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create release
+        id: create-release
+        uses: ./releases/create
+        with:
+          name: "Workflow '${{ github.workflow }}' run ${{ github.run_id }}"
+          body: |
+            This is a test Github release initiated by [this workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            Please ignore this
+          tag-name: test-${{ github.run_id }}
+
+      - name: Create artifacts
+        run: |
+          mkdir -p artifacts
+          echo "Hello world" >> artifacts/greeting.txt
+          echo "Goodbye world" >> artifacts/farewell.txt
+          cp docs/osi-approved-300x350.png artifacts/image.png
+
+      - name: Attach greeting.txt to release
+        uses: ./releases/upload-asset
+        with:
+          release-id: ${{ steps.create-release.outputs.release-id }}
+          path: artifacts/greeting.txt
+          name: greeting.txt
+
+      - name: Attach farewell.txt to release
+        uses: ./releases/upload-asset
+        with:
+          release-id: ${{ steps.create-release.outputs.release-id }}
+          path: artifacts/farewell.txt
+          name: farewell.txt
+
+      - name: Attach image to release
+        uses: ./releases/upload-asset
+        with:
+          release-id: ${{ steps.create-release.outputs.release-id }}
+          path: artifacts/image.png
+          name: image.png
+
+      - name: Delete release
+        uses: ./releases/delete
+        with:
+          release-id: ${{ steps.create-release.outputs.release-id }}
