@@ -24,9 +24,16 @@ Below are the list of available actions, with links to documentation:
 * [`issues/remove-label`](docs/issues-remove-label.md)
 * [`issues/set-labels`](docs/issues-set-labels.md)
 * [`issues/unlock`](docs/issues-unlock.md)
+* [`issues/update`](docs/issues-update.md)
 * [`issues/update-comment`](docs/issues-update-comment.md)
+* [`pulls/add-assignees`](docs/pulls-add-assignees.md)
+* [`pulls/add-labels`](docs/pulls-add-labels.md)
+* [`pulls/close`](docs/pulls-close.md)
+* [`pulls/create-comment`](docs/pulls-create-comment.md)
+* [`pulls/get`](docs/pulls-get.md)
 * [`releases/create`](docs/releases-create.md)
 * [`releases/delete`](docs/releases-delete.md)
+* [`releases/delete-asset`](docs/releases-delete-asset.md)
 * [`releases/upload-asset`](docs/releases-upload-asset.md)
 
 ## License

@@ -20,11 +20,13 @@ This requires `issues: write` permissions in order to work correctly.
 | Name | Description |
 |------|-------------|
 | `assignees` | A JSON array of all the assignee logins for this issue. |
+| `assignees-count` | The number of assignees to this issue. |
 | `body` | The body description of the issue |
 | `issue-api-url` | The API URL corresponding to this issue. |
 | `issue-number` | The number of the issue that was retrieved. |
 | `issue-url` | The browser URL corresponding to this issue. |
 | `labels` | A JSON array of all the label names for this issue. |
+| `labels-count` | The number of labels assigned to this issue. |
 | `locked` | Whether this issue is currently locked |
 | `state` | The state of the issue |
 | `state-reason` | The reason for the state |
@@ -56,11 +58,13 @@ run:
         uses: example-actions/use-issues-get@v3 # illustrative
         with:
           use-assignees: ${{ steps.issues-get.outputs.assignees }}
+          use-assignees-count: ${{ steps.issues-get.outputs.assignees-count }}
           use-body: ${{ steps.issues-get.outputs.body }}
           use-issue-api-url: ${{ steps.issues-get.outputs.issue-api-url }}
           use-issue-number: ${{ steps.issues-get.outputs.issue-number }}
           use-issue-url: ${{ steps.issues-get.outputs.issue-url }}
           use-labels: ${{ steps.issues-get.outputs.labels }}
+          use-labels-count: ${{ steps.issues-get.outputs.labels-count }}
           use-locked: ${{ steps.issues-get.outputs.locked }}
           use-state: ${{ steps.issues-get.outputs.state }}
           use-state-reason: ${{ steps.issues-get.outputs.state-reason }}
