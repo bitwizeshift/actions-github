@@ -126,7 +126,7 @@ func (ca *CompositeAction) WriteOutputTable(w io.Writer, path string) {
 }
 
 func (ca *CompositeAction) WriteExample(w io.Writer, path, version string) {
-	id := strcase.ToKebab(strings.ReplaceAll(ca.Name, " ", "_"))
+	id := strcase.ToKebab(strings.ReplaceAll(path, "/", "_"))
 	fmt.Fprintf(w, "## Example\n")
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, "Here is a very basic example of how to use the `%v` composite action\n", path)
