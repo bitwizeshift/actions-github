@@ -37,9 +37,15 @@ outputs:
   assignees:
     value: ${{ steps.get-issue.outputs.assignees }}
     description: A JSON array of all the assignee logins for this issue.
+  assignees-count:
+    value: ${{ steps.get-issue.outputs.assignees-count }}
+    description: The number of assignees to this issue.
   labels:
     value: ${{ steps.get-issue.outputs.labels }}
     description: A JSON array of all the label names for this issue.
+  labels-count:
+    value: ${{ steps.get-issue.outputs.labels-count }}
+    description: The number of labels assigned to this issue.
   title:
     value: ${{ steps.get-issue.outputs.title }}
     description: The title of the created issue
@@ -74,8 +80,10 @@ runs:
           core.setOutput('issue-number', issue.number)
           core.setOutput('issue-api-url', issue.url)
           core.setOutput('issue-url', issue.html_url)
-          core.setOutput('assignees', issue?.assignees?.map(v => v.login))
-          core.setOutput('labels', issue?.labels?.map(v => v.name))
+          core.setOutput('assignees', issue.assignees.map(v => v.login))
+          core.setOutput('assignees-count', issue.assignees.length)
+          core.setOutput('labels', issue.labels?.map(v => v.name))
+          core.setOutput('labels-count', issue.labels?.length)
           core.setOutput('title', issue?.title)
           core.setOutput('body', issue?.body)
           core.setOutput('state', issue?.state)
