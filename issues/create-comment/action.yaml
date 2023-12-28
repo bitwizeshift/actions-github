@@ -33,7 +33,10 @@ outputs:
     description: "The ID of the created comment"
   comment-url:
     value: ${{ steps.create-comment.outputs.comment-url }}
-    description: "A URL to the created comment"
+    description: "A browser URL to the created comment"
+  comment-api-url:
+    value: ${{ steps.create-comment.outputs.comment-api-url }}
+    description: "An API URL to the created comment"
 
 runs:
   using: "composite"
@@ -53,3 +56,4 @@ runs:
           })
           core.setOutput('comment-id', comment.id)
           core.setOutput('comment-url', comment.html_url)
+          core.setOutput('comment-api-url', comment.url)
