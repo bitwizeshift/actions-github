@@ -1,0 +1,27 @@
+name: Adds content to the git stage
+description: |
+  A composite action for adding content to the git stage.
+
+inputs:
+  path:
+    required: false
+    default: "."
+    description: "The path or paths to the content to add"
+outputs:
+  staged:
+    value: ${{ steps.add.outputs.staged }}
+    description: "`true` if any output was staged; `false` otherwise"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Add
+      id: add
+      shell: bash
+      run: |
+        git add ${{ inputs.path }}
+        if ! git diff --cached --exit-code 2>&1 1>/dev/null; then
+          echo "staged=true" >> "${GITHUB_OUTPUT}"
+        else
+          echo "staged=false" >> "${GITHUB_OUTPUT}"
+        fi

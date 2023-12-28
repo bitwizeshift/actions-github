@@ -1,0 +1,33 @@
+name: Push a git branch
+description: |
+  A composite action for pushing a git branch.
+
+  This requires `contents: write` permissions in order to work correctly.
+
+inputs:
+  branch:
+    required: true
+    description: "The name of the branch to push"
+  target-commitish:
+    required: false
+    default: HEAD
+    description: "The commit to push as the new branch"
+  force:
+    required: false
+    default: "false"
+    description: "Whether to force-push this branch"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Push
+      shell: bash
+      run: |
+        force=""
+        if [${{ inputs.force }} = "true"]; then
+          force="--force"
+        fi
+
+        git push                                                               \
+          origin ${{ inputs.target-commitish }}:${{ inputs.branch }}           \
+          ${force}

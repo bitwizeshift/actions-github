@@ -1,0 +1,49 @@
+name: Create a git commit
+description: |
+  A composite action for committing the current staged content.
+
+inputs:
+  title:
+    required: true
+    description: "The title of the commit message"
+  body:
+    required: false
+    default: ""
+    description: "The body of the commit message"
+  user-name:
+    required: false
+    default: "Octocat"
+    description: "The default user to commit as"
+  user-email:
+    required: false
+    default: "octocat@users.noreply.github.com"
+    description: "The email of the user to commit as"
+outputs:
+  sha1:
+    value: ${{ steps.commit.outputs.sha1 }}
+    description: The SHA1 of the newly created commit
+  sha1-short:
+    value: ${{ steps.update.outputs.comment-url }}
+    description: The short/succinct SHA1 of the newly created commit
+
+runs:
+  using: "composite"
+  steps:
+    - name: Commit
+      id: commit
+      shell: bash
+      env:
+        # Note: using an env variable here since we can use the Github pre-processor
+        # expansion, which can allow embedded backticks without triggering shell
+        # substitution.
+        COMMIT_MESSAGE: |
+          ${{ inputs.title }}
+
+          ${{ inputs.body }}
+      run: |
+        git config --global user.email "${{ inputs.user-email }}"
+        git config --global user.name "${{ inputs.user-name }}"
+        git commit -m '${{ env.COMMIT_MESSAGE }}'
+
+        echo "sha1=$(git rev-parse HEAD)" >> "${GITHUB_OUTPUT}"
+        echo "sha1-short=$(git rev-parse --short HEAD)" >> "${GITHUB_OUTPUT}"
