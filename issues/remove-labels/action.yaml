@@ -37,7 +37,7 @@ runs:
         retries: ${{ inputs.retries }}
         retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
         script: |
-          for label in `${{ inputs.labels }}`.split(/[\n,]/).map(s => s.trim()).filter(s => s) {
+          for (const label of `${{ inputs.labels }}`.split(/[\n,]/).map(s => s.trim()).filter(s => s)) {
             github.rest.issues.removeLabel({
               owner: `${{ inputs.owner }}` || context.repo.owner,
               repo: `${{ inputs.repo }}` || context.repo.repo,
