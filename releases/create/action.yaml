@@ -1,0 +1,91 @@
+name: Create a release
+description: |
+  A composite action that creates a comment on Github.
+  Requires the `issues: write` permission to work.
+
+inputs:
+  tag-name:
+    required: true
+    description: The name of the tag to associated to the release.
+  name:
+    required: false
+    default: ""
+    description: "The name to give this artifact. Must be unique."
+  body:
+    required: false
+    default: ""
+    description: "The body of the release description"
+  target-commitish:
+    required: false
+    default: ""
+    description: The commitish that will refer to where this release is created from.
+  draft:
+    required: false
+    default: "false"
+    description: |
+      true to create a draft (unpublished) release, false to create a published one.
+  prerelease:
+    required: false
+    default: "false"
+    description: |
+      true to identify the release as a prerelease. false to identify the
+      release as a full release.
+  generate-release-notes:
+    required: false
+    default: "false"
+    description: |
+      Whether to automatically generate the name and body for this release. If
+      name is specified, the specified name will be used; otherwise, a name will
+      be automatically generated. If body is specified, the body will be
+      pre-pended to the automatically generated notes.
+  owner:
+    required: false
+    default: ""
+    description: "The repository owner"
+  repo:
+    required: false
+    default: ""
+    description: "The repository"
+  retries:
+    required: false
+    default: "0"
+    description: "The number of times to try retrying"
+  retry-exempt-status-codes:
+    required: false
+    default: "400,401,403,404,422"
+    description: "The retry exempt status codes"
+outputs:
+  release-id:
+    value: ${{ steps.create-release.outputs.release-id }}
+    description: The ID of the created release
+  release-url:
+    value: ${{ steps.create-release.outputs.release-url }}
+    description: The browser URL leading to the release page
+  release-api-url:
+    value: ${{ steps.create-release.outputs.release-api-url }}
+    description: The API URL to the release
+
+runs:
+  using: "composite"
+  steps:
+    - name: Upload asset
+      id: create-release
+      uses: actions/github-script@v7
+      with:
+        retries: ${{ inputs.retries }}
+        retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        script: |
+          const { data: release } = await github.rest.repos.createRelease({
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            tag_name: `${{ inputs.tag-name }}`,
+            target_commitish: `${{ inputs.target-commitish }}`,
+            name: `${{ inputs.name }}`,
+            body: `${{ inputs.body }}`,
+            draft: ${{ inputs.draft }},
+            prerelease: ${{ inputs.prerelease }},
+            generate_release_notes: ${{ inputs.generate-release-notes }}
+          });
+          core.setOutput('release-id', release.id)
+          core.setOutput('release-api-url', release.url)
+          core.setOutput('release-url', release.html_url)

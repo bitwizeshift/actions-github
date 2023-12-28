@@ -1,0 +1,65 @@
+name: Upload a release asset
+description: |
+  A composite action that uploads an asset to a Github release.
+  Requires the `issues: write` permission to work.
+
+inputs:
+  release-id:
+    required: true
+    description: "The ID of the release"
+  name:
+    required: true
+    description: "The name to give this artifact. Must be unique."
+  path:
+    required: true
+    description: "Path to the file that will be used as a release artifact"
+  owner:
+    required: false
+    default: ""
+    description: "The repository owner"
+  repo:
+    required: false
+    default: ""
+    description: "The repository"
+  retries:
+    required: false
+    default: "0"
+    description: "The number of times to try retrying"
+  retry-exempt-status-codes:
+    required: false
+    default: "400,401,403,404,422"
+    description: "The retry exempt status codes"
+outputs:
+  asset-id:
+    value: ${{ steps.upload-asset.outputs.asset-id }}
+    description: The ID of the created asset
+  asset-url:
+    value: ${{ steps.upload-asset.outputs.asset-url }}
+    description: The browser URL of the uploaded asset
+  asset-api-url:
+    value: ${{ steps.upload-asset.outputs.asset-url }}
+    description: The API URL of the uploaded asset
+
+runs:
+  using: "composite"
+  steps:
+    - name: Upload asset
+      id: upload-asset
+      uses: actions/github-script@v7
+      with:
+        retries: ${{ inputs.retries }}
+        retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        script: |
+          const fs = require("fs");
+          const content = fs.readFileSync("${{ inputs.path }}");
+          const { data: asset } = await github.rest.repos.uploadReleaseAsset({
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            release_id: ${{ inputs.release-id }},
+            name: `${{ inputs.name }}`,
+            data: content,
+          });
+          core.setOutput('asset-id', asset.id)
+          core.setOutput('asset-url', asset.browser_download_url)
+          core.setOutput('asset-api-url', asset.url)
+
