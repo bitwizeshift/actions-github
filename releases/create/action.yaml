@@ -41,19 +41,31 @@ inputs:
   owner:
     required: false
     default: ""
-    description: "The repository owner"
+    description: |
+      The repository owner.
+      If unspecified, this will default to the owner of the current repository.
   repo:
     required: false
     default: ""
-    description: "The repository"
+    description: |
+      The name of the repository.
+      If unspecified, this will default to the current repository.
+  github-token:
+    required: false
+    default: "${{ github.token }}"
+    description: |
+      The default token to use for this Git operation.
+      If unspecified, this will default to `github.token`.
   retries:
     required: false
     default: "0"
-    description: "The number of times to try retrying"
+    description: |
+      The number of times to attempt to retry if this fails.
   retry-exempt-status-codes:
     required: false
     default: "400,401,403,404,422"
-    description: "The retry exempt status codes"
+    description: |
+      A list of error-codes that are exempt from being retried.
 outputs:
   release-id:
     value: ${{ steps.create-release.outputs.release-id }}
@@ -74,6 +86,7 @@ runs:
       with:
         retries: ${{ inputs.retries }}
         retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        github-token: ${{ inputs.github-token }}
         script: |
           const { data: release } = await github.rest.repos.createRelease({
             owner: `${{ inputs.owner }}` || context.repo.owner,
