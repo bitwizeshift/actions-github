@@ -1,0 +1,99 @@
+name: Create issue or comment
+description: |
+  A composite action for getting either creating a Github issue, or commenting on
+  an existing one, based on the author and the provided label(s), assignees, etc.
+  This requires `issues: write` permissions in order to work correctly.
+
+inputs:
+  title:
+    required: true
+    description: "The title to use for the issue"
+  body:
+    required: false
+    default: ""
+    description: "The body text of the github issue"
+  comment:
+    required: false
+    default: ${{ inputs.body }}
+    description: "The comment to leave if an issue already exists"
+  labels:
+    required: false
+    default: ""
+    description: "A list of labels to add, separated by newlines."
+  assignees:
+    required: false
+    default: ""
+    description: "A list of assignees to add, separated by newlines."
+  owner:
+    required: false
+    default: ""
+    description: "The repository owner"
+  repo:
+    required: false
+    default: ""
+    description: "The repository"
+  retries:
+    required: false
+    default: "3"
+    description: "The number of times to try retrying"
+  retry-exempt-status-codes:
+    required: false
+    default: "400,401,403,404,422"
+    description: "The retry exempt status codes"
+outputs:
+  issue-number:
+    value: ${{ steps.create-or-comment.outputs.issue-number }}
+    description: "The number of the created issue"
+  issue-url:
+    value: ${{ steps.create-or-comment.outputs.issue-url }}
+    description: "The HTTP URL of the newly created issue"
+  created-issue:
+    value: ${{ steps.create-or-comment.outputs.created-issue }}
+    description: "A boolean indicating whether a new issue was created"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create issue or comment on existing
+      id: create-or-comment
+      uses: actions/github-script@v7
+      with:
+        retries: ${{ inputs.retries }}
+        retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        script: |
+          const issues = await github.paginate(github.rest.issues.listForRepo, {
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            labels: `${{ inputs.labels }}`.split(/[\n,]/).map(s => s.trim()).filter(s => s),
+            assignees: `${{ inputs.assignees }}`.split(/[\n,]/).map(s => s.trim()).filter(s => s),
+            state: 'open',
+          })
+          for (const issue of issues) {
+            if (!issue.pull_request) {
+              await github.rest.issues.createComment({
+                issue_number: issue.number,
+                owner: `${{ inputs.owner }}` || context.repo.owner,
+                repo: `${{ inputs.repo }}` || context.repo.repo,
+                body: `${{ inputs.comment }}`
+              })
+              core.setOutput('issue-number', issue.number)
+              core.setOutput('issue-url', issue.html_url)
+              core.setOutput('created-issue', false)
+              return
+            }
+          }
+
+          await github.rest.issues.create({
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            labels: `${{ inputs.labels }}`.split(/[\n,]/).map(s => s.trim()).filter(s => s),
+            title: `${{ inputs.title }}`,
+            body: `${{ inputs.body }}`,
+            assignees: `${{ inputs.assignees }}`.split(/[\n,]/).map(s => s.trim()).filter(s => s),
+          })
+          core.setOutput('issue-number', issue.number)
+          core.setOutput('issue-url', issue.html_url)
+          core.setOutput('created-issue', true)
+
+
+

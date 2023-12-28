@@ -1,0 +1,45 @@
+name: Sets labels on an issue
+description: |
+  A composite action for setting labels to github issues.
+  This requires `issues: write` permissions in order to work correctly.
+
+inputs:
+  labels:
+    required: true
+    description: "A list of labels to add, separated by newlines."
+  issue-number:
+    required: false
+    default: "0"
+    description: "The issue number to comment on"
+  owner:
+    required: false
+    default: ""
+    description: "The repository owner"
+  repo:
+    required: false
+    default: ""
+    description: "The repository"
+  retries:
+    required: false
+    default: "0"
+    description: "The number of times to try retrying"
+  retry-exempt-status-codes:
+    required: false
+    default: "400,401,403,404,422"
+    description: "The retry exempt status codes"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Add issue labels
+      uses: actions/github-script@v7
+      with:
+        retries: ${{ inputs.retries }}
+        retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        script: |
+          github.rest.issues.setLabels({
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            issue_number: ${{ inputs.issue-number }} || context.issue.number,
+            labels: `${{ inputs.labels }}`.split(/[\n,]/).map(s => s.trim()).filter(s => s)
+          });

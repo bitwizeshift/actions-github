@@ -1,0 +1,83 @@
+name: Gets an issue
+description: |
+  A composite action for getting a github issue by its issue number.
+  This requires `issues: write` permissions in order to work correctly.
+
+inputs:
+  issue-number:
+    required: false
+    default: "0"
+    description: "The issue number to comment on"
+  owner:
+    required: false
+    default: ""
+    description: "The repository owner"
+  repo:
+    required: false
+    default: ""
+    description: "The repository"
+  retries:
+    required: false
+    default: "3"
+    description: "The number of times to try retrying"
+  retry-exempt-status-codes:
+    required: false
+    default: "400,401,403,404,422"
+    description: "The retry exempt status codes"
+outputs:
+  issue-number:
+    value: ${{ steps.get-issue.outputs.issue-number }}
+    description: The number of the issue that was retrieved.
+  issue-api-url:
+    value: ${{ steps.get-issue.outputs.issue-api-url }}
+    description: The API URL corresponding to this issue.
+  issue-url:
+    value: ${{ steps.get-issue.outputs.issue-url }}
+    description: The browser URL corresponding to this issue.
+  assignees:
+    value: ${{ steps.get-issue.outputs.assignees }}
+    description: A JSON array of all the assignee logins for this issue.
+  labels:
+    value: ${{ steps.get-issue.outputs.labels }}
+    description: A JSON array of all the label names for this issue.
+  title:
+    value: ${{ steps.get-issue.outputs.title }}
+    description: The title of the created issue
+  body:
+    value: ${{ steps.get-issue.outputs.body }}
+    description: The body description of the issue
+  state:
+    value: ${{ steps.get-issue.outputs.state }}
+    description: The state of the issue
+  state-reason:
+    value: ${{ steps.get-issue.outputs.state-reason }}
+    description: The reason for the state
+  locked:
+    value: ${{ steps.get-issue.outputs.locked }}
+    description: Whether this issue is currently locked
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get issue
+      id: get-issue
+      uses: actions/github-script@v7
+      with:
+        retries: ${{ inputs.retries }}
+        retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        script: |
+          const { data: issue } = await github.rest.issues.get({
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            issue_number: ${{ inputs.issue-number }} || context.issue.number,
+          })
+          core.setOutput('issue-number', issue.number)
+          core.setOutput('issue-api-url', issue.url)
+          core.setOutput('issue-url', issue.html_url)
+          core.setOutput('assignees', issue?.assignees?.map(v => v.login))
+          core.setOutput('labels', issue?.labels?.map(v => v.name))
+          core.setOutput('title', issue?.title)
+          core.setOutput('body', issue?.body)
+          core.setOutput('state', issue?.state)
+          core.setOutput('state-reason', issue?.state_reason)
+          core.setOutput('locked', issue?.locked)
