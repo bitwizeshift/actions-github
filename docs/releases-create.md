@@ -13,12 +13,13 @@ Requires the `contents: write` permission to work.
 | `body` | The body of the release description | `""` |
 | `draft` | true to create a draft (unpublished) release, false to create a published one.  | `"false"` |
 | `generate-release-notes` | Whether to automatically generate the name and body for this release. If name is specified, the specified name will be used; otherwise, a name will be automatically generated. If body is specified, the body will be pre-pended to the automatically generated notes.  | `"false"` |
+| `github-token` | The default token to use for this Git operation. If unspecified, this will default to `github.token`.  | `"${{ github.token }}"` |
 | `name` | The name to give this artifact. Must be unique. | `""` |
-| `owner` | The repository owner | `""` |
+| `owner` | The repository owner. If unspecified, this will default to the owner of the current repository.  | `""` |
 | `prerelease` | true to identify the release as a prerelease. false to identify the release as a full release.  | `"false"` |
-| `repo` | The repository | `""` |
-| `retries` | The number of times to try retrying | `"0"` |
-| `retry-exempt-status-codes` | The retry exempt status codes | `"400,401,403,404,422"` |
+| `repo` | The name of the repository. If unspecified, this will default to the current repository.  | `""` |
+| `retries` | The number of times to attempt to retry if this fails.  | `"0"` |
+| `retry-exempt-status-codes` | A list of error-codes that are exempt from being retried.  | `"400,401,403,404,422"` |
 | `target-commitish` | The commitish that will refer to where this release is created from. | `""` |
 
 **Note:** _(*) marks required inputs_
@@ -53,6 +54,7 @@ run:
           body: BODY
           draft: DRAFT
           generate-release-notes: GENERATE_RELEASE_NOTES
+          github-token: GITHUB_TOKEN
           name: NAME
           owner: OWNER
           prerelease: PRERELEASE

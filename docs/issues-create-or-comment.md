@@ -14,11 +14,12 @@ This requires `issues: write` permissions in order to work correctly.
 | `assignees` | A list of assignees to add, separated by newlines. | `""` |
 | `body` | The body text of the github issue | `""` |
 | `comment` | The comment to leave if an issue already exists | `"${{ inputs.body }}"` |
+| `github-token` | The default token to use for this Git operation. If unspecified, this will default to `github.token`.  | `"${{ github.token }}"` |
 | `labels` | A list of labels to add, separated by newlines. | `""` |
-| `owner` | The repository owner | `""` |
-| `repo` | The repository | `""` |
-| `retries` | The number of times to try retrying | `"3"` |
-| `retry-exempt-status-codes` | The retry exempt status codes | `"400,401,403,404,422"` |
+| `owner` | The repository owner. If unspecified, this will default to the owner of the current repository.  | `""` |
+| `repo` | The name of the repository. If unspecified, this will default to the current repository.  | `""` |
+| `retries` | The number of times to attempt to retry if this fails.  | `"0"` |
+| `retry-exempt-status-codes` | A list of error-codes that are exempt from being retried.  | `"400,401,403,404,422"` |
 
 **Note:** _(*) marks required inputs_
 
@@ -52,6 +53,7 @@ run:
           assignees: ASSIGNEES
           body: BODY
           comment: COMMENT
+          github-token: GITHUB_TOKEN
           labels: LABELS
           owner: OWNER
           repo: REPO

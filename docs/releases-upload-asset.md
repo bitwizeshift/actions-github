@@ -12,10 +12,11 @@ Requires the `issues: write` permission to work.
 | `name` (*) | The name to give this artifact. Must be unique. | _N/A_ |
 | `path` (*) | Path to the file that will be used as a release artifact | _N/A_ |
 | `release-id` (*) | The ID of the release | _N/A_ |
-| `owner` | The repository owner | `""` |
-| `repo` | The repository | `""` |
-| `retries` | The number of times to try retrying | `"0"` |
-| `retry-exempt-status-codes` | The retry exempt status codes | `"400,401,403,404,422"` |
+| `github-token` | The default token to use for this Git operation. If unspecified, this will default to `github.token`.  | `"${{ github.token }}"` |
+| `owner` | The repository owner. If unspecified, this will default to the owner of the current repository.  | `""` |
+| `repo` | The name of the repository. If unspecified, this will default to the current repository.  | `""` |
+| `retries` | The number of times to attempt to retry if this fails.  | `"0"` |
+| `retry-exempt-status-codes` | A list of error-codes that are exempt from being retried.  | `"400,401,403,404,422"` |
 
 **Note:** _(*) marks required inputs_
 
@@ -48,6 +49,7 @@ run:
           release-id: RELEASE_ID
 
           # Optional inputs
+          github-token: GITHUB_TOKEN
           owner: OWNER
           repo: REPO
           retries: RETRIES

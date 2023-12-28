@@ -10,11 +10,12 @@ Requires the `issues: write` permission to work.
 | Name | Description | Default |
 |------|-------------|---------|
 | `body` (*) | The message to comment | _N/A_ |
+| `github-token` | The default token to use for this Git operation. If unspecified, this will default to `github.token`.  | `"${{ github.token }}"` |
 | `issue-number` | The issue number to comment on | `"0"` |
-| `owner` | The repository owner | `""` |
-| `repo` | The repository | `""` |
-| `retries` | The number of times to try retrying | `"0"` |
-| `retry-exempt-status-codes` | The retry exempt status codes | `"400,401,403,404,422"` |
+| `owner` | The repository owner. If unspecified, this will default to the owner of the current repository.  | `""` |
+| `repo` | The name of the repository. If unspecified, this will default to the current repository.  | `""` |
+| `retries` | The number of times to attempt to retry if this fails.  | `"0"` |
+| `retry-exempt-status-codes` | A list of error-codes that are exempt from being retried.  | `"400,401,403,404,422"` |
 
 **Note:** _(*) marks required inputs_
 
@@ -45,6 +46,7 @@ run:
           body: BODY
 
           # Optional inputs
+          github-token: GITHUB_TOKEN
           issue-number: ISSUE_NUMBER
           owner: OWNER
           repo: REPO

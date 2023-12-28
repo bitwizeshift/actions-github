@@ -10,11 +10,12 @@ This requires `pull-requests: write` permissions in order to work correctly.
 | Name | Description | Default |
 |------|-------------|---------|
 | `labels` (*) | A list of labels to add, separated by newlines. | _N/A_ |
-| `owner` | The repository owner | `""` |
+| `github-token` | The default token to use for this Git operation. If unspecified, this will default to `github.token`.  | `"${{ github.token }}"` |
+| `owner` | The repository owner. If unspecified, this will default to the owner of the current repository.  | `""` |
 | `pull-number` | The pull request number to update | `"0"` |
-| `repo` | The repository | `""` |
-| `retries` | The number of times to try retrying | `"0"` |
-| `retry-exempt-status-codes` | The retry exempt status codes | `"400,401,403,404,422"` |
+| `repo` | The name of the repository. If unspecified, this will default to the current repository.  | `""` |
+| `retries` | The number of times to attempt to retry if this fails.  | `"0"` |
+| `retry-exempt-status-codes` | A list of error-codes that are exempt from being retried.  | `"400,401,403,404,422"` |
 
 **Note:** _(*) marks required inputs_
 
@@ -40,6 +41,7 @@ run:
           labels: LABELS
 
           # Optional inputs
+          github-token: GITHUB_TOKEN
           owner: OWNER
           pull-number: PULL_NUMBER
           repo: REPO
