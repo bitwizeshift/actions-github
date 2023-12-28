@@ -35,7 +35,7 @@ run:
     steps:
       # ... 
       - name: Delete a release
-        id: delete-a-release # only necessary if using this action's output
+        id: releases-delete # only necessary if using this action's output
         uses: bitwizeshift/actions-github/releases/delete@v1
         with:
           # Required inputs
@@ -48,7 +48,7 @@ run:
           retry-exempt-status-codes: RETRY_EXEMPT_STATUS_CODES
       # ... 
       - name: Uses "Delete a release" Outputs
-        uses: example-actions/use-delete-a-release@v3 # illustrative
+        uses: example-actions/use-releases-delete@v3 # illustrative
         with:
-          use-release-id: ${{ steps.delete-a-release.outputs.release-id }}
+          use-release-id: ${{ steps.releases-delete.outputs.release-id }}
 ```

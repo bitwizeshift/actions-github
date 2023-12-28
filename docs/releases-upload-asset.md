@@ -39,7 +39,7 @@ run:
     steps:
       # ... 
       - name: Upload a release asset
-        id: upload-a-release-asset # only necessary if using this action's output(s)
+        id: releases-upload-asset # only necessary if using this action's output(s)
         uses: bitwizeshift/actions-github/releases/upload-asset@v1
         with:
           # Required inputs
@@ -54,9 +54,9 @@ run:
           retry-exempt-status-codes: RETRY_EXEMPT_STATUS_CODES
       # ... 
       - name: Uses "Upload a release asset" Outputs
-        uses: example-actions/use-upload-a-release-asset@v3 # illustrative
+        uses: example-actions/use-releases-upload-asset@v3 # illustrative
         with:
-          use-asset-id: ${{ steps.upload-a-release-asset.outputs.asset-id }}
-          use-asset-url: ${{ steps.upload-a-release-asset.outputs.asset-url }}
-          use-asset-api-url: ${{ steps.upload-a-release-asset.outputs.asset-api-url }}
+          use-asset-api-url: ${{ steps.releases-upload-asset.outputs.asset-api-url }}
+          use-asset-id: ${{ steps.releases-upload-asset.outputs.asset-id }}
+          use-asset-url: ${{ steps.releases-upload-asset.outputs.asset-url }}
 ```

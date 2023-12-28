@@ -42,7 +42,7 @@ run:
     steps:
       # ... 
       - name: Gets an issue
-        id: gets-an-issue # only necessary if using this action's output(s)
+        id: issues-get # only necessary if using this action's output(s)
         uses: bitwizeshift/actions-github/issues/get@v1
         with:
           # Optional inputs
@@ -53,16 +53,16 @@ run:
           retry-exempt-status-codes: RETRY_EXEMPT_STATUS_CODES
       # ... 
       - name: Uses "Gets an issue" Outputs
-        uses: example-actions/use-gets-an-issue@v3 # illustrative
+        uses: example-actions/use-issues-get@v3 # illustrative
         with:
-          use-issue-api-url: ${{ steps.gets-an-issue.outputs.issue-api-url }}
-          use-labels: ${{ steps.gets-an-issue.outputs.labels }}
-          use-body: ${{ steps.gets-an-issue.outputs.body }}
-          use-state: ${{ steps.gets-an-issue.outputs.state }}
-          use-state-reason: ${{ steps.gets-an-issue.outputs.state-reason }}
-          use-issue-number: ${{ steps.gets-an-issue.outputs.issue-number }}
-          use-issue-url: ${{ steps.gets-an-issue.outputs.issue-url }}
-          use-assignees: ${{ steps.gets-an-issue.outputs.assignees }}
-          use-title: ${{ steps.gets-an-issue.outputs.title }}
-          use-locked: ${{ steps.gets-an-issue.outputs.locked }}
+          use-assignees: ${{ steps.issues-get.outputs.assignees }}
+          use-body: ${{ steps.issues-get.outputs.body }}
+          use-issue-api-url: ${{ steps.issues-get.outputs.issue-api-url }}
+          use-issue-number: ${{ steps.issues-get.outputs.issue-number }}
+          use-issue-url: ${{ steps.issues-get.outputs.issue-url }}
+          use-labels: ${{ steps.issues-get.outputs.labels }}
+          use-locked: ${{ steps.issues-get.outputs.locked }}
+          use-state: ${{ steps.issues-get.outputs.state }}
+          use-state-reason: ${{ steps.issues-get.outputs.state-reason }}
+          use-title: ${{ steps.issues-get.outputs.title }}
 ```

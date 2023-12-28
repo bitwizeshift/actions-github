@@ -8,6 +8,9 @@ repository in [Github workflows]. All actions wrap the [octokit api] via
 
 Below are the list of available actions, with links to documentation:
 
+* [`git/add`](docs/git-add.md)
+* [`git/commit`](docs/git-commit.md)
+* [`git/push`](docs/git-push.md)
 * [`issues/add-assignees`](docs/issues-add-assignees.md)
 * [`issues/add-labels`](docs/issues-add-labels.md)
 * [`issues/close`](docs/issues-close.md)

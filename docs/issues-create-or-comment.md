@@ -42,7 +42,7 @@ run:
     steps:
       # ... 
       - name: Create issue or comment
-        id: create-issue-or-comment # only necessary if using this action's output(s)
+        id: issues-create-or-comment # only necessary if using this action's output(s)
         uses: bitwizeshift/actions-github/issues/create-or-comment@v1
         with:
           # Required inputs
@@ -59,9 +59,9 @@ run:
           retry-exempt-status-codes: RETRY_EXEMPT_STATUS_CODES
       # ... 
       - name: Uses "Create issue or comment" Outputs
-        uses: example-actions/use-create-issue-or-comment@v3 # illustrative
+        uses: example-actions/use-issues-create-or-comment@v3 # illustrative
         with:
-          use-created-issue: ${{ steps.create-issue-or-comment.outputs.created-issue }}
-          use-issue-number: ${{ steps.create-issue-or-comment.outputs.issue-number }}
-          use-issue-url: ${{ steps.create-issue-or-comment.outputs.issue-url }}
+          use-created-issue: ${{ steps.issues-create-or-comment.outputs.created-issue }}
+          use-issue-number: ${{ steps.issues-create-or-comment.outputs.issue-number }}
+          use-issue-url: ${{ steps.issues-create-or-comment.outputs.issue-url }}
 ```

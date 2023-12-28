@@ -43,7 +43,7 @@ run:
     steps:
       # ... 
       - name: Create a release
-        id: create-a-release # only necessary if using this action's output(s)
+        id: releases-create # only necessary if using this action's output(s)
         uses: bitwizeshift/actions-github/releases/create@v1
         with:
           # Required inputs
@@ -62,9 +62,9 @@ run:
           target-commitish: TARGET_COMMITISH
       # ... 
       - name: Uses "Create a release" Outputs
-        uses: example-actions/use-create-a-release@v3 # illustrative
+        uses: example-actions/use-releases-create@v3 # illustrative
         with:
-          use-release-id: ${{ steps.create-a-release.outputs.release-id }}
-          use-release-url: ${{ steps.create-a-release.outputs.release-url }}
-          use-release-api-url: ${{ steps.create-a-release.outputs.release-api-url }}
+          use-release-api-url: ${{ steps.releases-create.outputs.release-api-url }}
+          use-release-id: ${{ steps.releases-create.outputs.release-id }}
+          use-release-url: ${{ steps.releases-create.outputs.release-url }}
 ```

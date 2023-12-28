@@ -39,7 +39,7 @@ run:
     steps:
       # ... 
       - name: Create issue
-        id: create-issue # only necessary if using this action's output(s)
+        id: issues-create # only necessary if using this action's output(s)
         uses: bitwizeshift/actions-github/issues/create@v1
         with:
           # Required inputs
@@ -55,8 +55,8 @@ run:
           retry-exempt-status-codes: RETRY_EXEMPT_STATUS_CODES
       # ... 
       - name: Uses "Create issue" Outputs
-        uses: example-actions/use-create-issue@v3 # illustrative
+        uses: example-actions/use-issues-create@v3 # illustrative
         with:
-          use-issue-number: ${{ steps.create-issue.outputs.issue-number }}
-          use-issue-url: ${{ steps.create-issue.outputs.issue-url }}
+          use-issue-number: ${{ steps.issues-create.outputs.issue-number }}
+          use-issue-url: ${{ steps.issues-create.outputs.issue-url }}
 ```

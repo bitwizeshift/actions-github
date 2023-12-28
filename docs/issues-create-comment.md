@@ -37,7 +37,7 @@ run:
     steps:
       # ... 
       - name: Create comment on Issue
-        id: create-comment-on-issue # only necessary if using this action's output(s)
+        id: issues-create-comment # only necessary if using this action's output(s)
         uses: bitwizeshift/actions-github/issues/create-comment@v1
         with:
           # Required inputs
@@ -51,8 +51,8 @@ run:
           retry-exempt-status-codes: RETRY_EXEMPT_STATUS_CODES
       # ... 
       - name: Uses "Create comment on Issue" Outputs
-        uses: example-actions/use-create-comment-on-issue@v3 # illustrative
+        uses: example-actions/use-issues-create-comment@v3 # illustrative
         with:
-          use-comment-id: ${{ steps.create-comment-on-issue.outputs.comment-id }}
-          use-comment-url: ${{ steps.create-comment-on-issue.outputs.comment-url }}
+          use-comment-id: ${{ steps.issues-create-comment.outputs.comment-id }}
+          use-comment-url: ${{ steps.issues-create-comment.outputs.comment-url }}
 ```

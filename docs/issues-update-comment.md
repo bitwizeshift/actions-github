@@ -37,7 +37,7 @@ run:
     steps:
       # ... 
       - name: Update comment on Issue
-        id: update-comment-on-issue # only necessary if using this action's output(s)
+        id: issues-update-comment # only necessary if using this action's output(s)
         uses: bitwizeshift/actions-github/issues/update-comment@v1
         with:
           # Required inputs
@@ -51,8 +51,8 @@ run:
           retry-exempt-status-codes: RETRY_EXEMPT_STATUS_CODES
       # ... 
       - name: Uses "Update comment on Issue" Outputs
-        uses: example-actions/use-update-comment-on-issue@v3 # illustrative
+        uses: example-actions/use-issues-update-comment@v3 # illustrative
         with:
-          use-comment-id: ${{ steps.update-comment-on-issue.outputs.comment-id }}
-          use-comment-url: ${{ steps.update-comment-on-issue.outputs.comment-url }}
+          use-comment-id: ${{ steps.issues-update-comment.outputs.comment-id }}
+          use-comment-url: ${{ steps.issues-update-comment.outputs.comment-url }}
 ```
