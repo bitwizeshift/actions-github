@@ -1,0 +1,53 @@
+name: Lock issue
+description: |
+  A composite action for locking github issues.
+  This requires `issues: write` permissions in order to work correctly.
+
+inputs:
+  issue-number:
+    required: false
+    default: "0"
+    description: "The issue number to comment on"
+  lock-reason:
+    required: false
+    default: "resolved"
+    description: |
+      The reason the issue is being locked.
+      Must be one of:
+      * off-topic
+      * too heated
+      * resolved
+      * spam
+  owner:
+    required: false
+    default: ""
+    description: "The repository owner"
+  repo:
+    required: false
+    default: ""
+    description: "The repository"
+  retries:
+    required: false
+    default: "0"
+    description: "The number of times to try retrying"
+  retry-exempt-status-codes:
+    required: false
+    default: "400,401,403,404,422"
+    description: "The retry exempt status codes"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Lock Issue
+      id: update
+      uses: actions/github-script@v7
+      with:
+        retries: ${{ inputs.retries }}
+        retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        script: |
+          github.rest.issues.lock({
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            issue_number: ${{ inputs.issue-number }} || context.issue.number,
+            lock_reason: `${{ inputs.lock-reason }}`
+          });

@@ -1,0 +1,56 @@
+name: Update comment on Issue
+description: |
+  A composite action for adding labels to github issues.
+  This requires `issues: write` permissions in order to work correctly.
+
+inputs:
+  comment-id:
+    required: true
+    description: "The ID of the comment to update"
+  body:
+    required: true
+    description: "The body of the comment to update the message to"
+  owner:
+    required: false
+    default: ""
+    description: "The repository owner"
+  repo:
+    required: false
+    default: ""
+    description: "The repository"
+  retries:
+    required: false
+    default: "0"
+    description: "The number of times to try retrying"
+  retry-exempt-status-codes:
+    required: false
+    default: "400,401,403,404,422"
+    description: "The retry exempt status codes"
+outputs:
+  comment-id:
+    value: ${{ steps.update.outputs.comment-id }}
+    description: The ID of the updated comment
+  comment-url:
+    value: ${{ steps.update.outputs.comment-url }}
+    description: The URL of the comment that is updated
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update Comment
+      id: update
+      uses: actions/github-script@v7
+      with:
+        retries: ${{ inputs.retries }}
+        retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        script: |
+          const { data: comment } = await github.rest.issues.updateComment({
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            comment_id: ${{ inputs.comment-id }},
+            body: `${{ inputs.body }}`
+          });
+          core.setOutput('comment-id', comment.id)
+          core.setOutput('comment-url', comment.html_url)
+
+

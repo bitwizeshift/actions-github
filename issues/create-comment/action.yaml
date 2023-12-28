@@ -1,0 +1,55 @@
+name: Create comment on Issue
+description: |
+  A composite action that creates a comment on Github.
+  Requires the `issues: write` permission to work.
+
+inputs:
+  body:
+    required: true
+    description: "The message to comment"
+  issue-number:
+    required: false
+    default: "0"
+    description: "The issue number to comment on"
+  owner:
+    required: false
+    default: ""
+    description: "The repository owner"
+  repo:
+    required: false
+    default: ""
+    description: "The repository"
+  retries:
+    required: false
+    default: "0"
+    description: "The number of times to try retrying"
+  retry-exempt-status-codes:
+    required: false
+    default: "400,401,403,404,422"
+    description: "The retry exempt status codes"
+outputs:
+  comment-id:
+    value: ${{ steps.create-comment.outputs.comment-id }}
+    description: "The ID of the created comment"
+  comment-url:
+    value: ${{ steps.create-comment.outputs.comment-url }}
+    description: "A URL to the created comment"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create comment
+      id: create-comment
+      uses: actions/github-script@v7
+      with:
+        retries: ${{ inputs.retries }}
+        retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        script: |
+          const { data: comment } = await github.rest.issues.createComment({
+            issue_number: ${{ inputs.issue-number }} || context.issue.number,
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            body: `${{ inputs.body }}`
+          })
+          core.setOutput('comment-id', comment.id)
+          core.setOutput('comment-url', comment.html_url)
