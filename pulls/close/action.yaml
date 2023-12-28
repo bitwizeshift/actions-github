@@ -1,0 +1,48 @@
+name: Close pull request
+description: |
+  A composite action for closing a pull request.
+  This requires `pulls: write` permissions in order to work correctly.
+
+inputs:
+  pull-number:
+    required: false
+    default: "0"
+    description: "The pull request number to comment on"
+  owner:
+    required: false
+    default: ""
+    description: "The repository owner"
+  repo:
+    required: false
+    default: ""
+    description: "The repository"
+  retries:
+    required: false
+    default: "0"
+    description: "The number of times to try retrying"
+  retry-exempt-status-codes:
+    required: false
+    default: "400,401,403,404,422"
+    description: "The retry exempt status codes"
+outputs:
+  pull-number:
+    value: ${{ steps.close.outputs.pull-number }}
+    description: "The pull request number that was closed"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Close pull request
+      id: close
+      uses: actions/github-script@v7
+      with:
+        retries: ${{ inputs.retries }}
+        retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        script: |
+          const { data: pull } = await github.rest.pulls.update({
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            pull_number: ${{ inputs.pull_number }} || context.issue.number,
+            state: 'closed'
+          });
+          core.setOutput('pull-number', pull.number)
