@@ -55,7 +55,7 @@ runs:
           const { data: pull } = await github.rest.pulls.update({
             owner: `${{ inputs.owner }}` || context.repo.owner,
             repo: `${{ inputs.repo }}` || context.repo.repo,
-            pull_number: ${{ inputs.pull_number }} || context.issue.number,
+            pull_number: ${{ inputs.pull-number }} || context.issue.number,
             state: 'closed'
           });
           core.setOutput('pull-number', pull.number)
