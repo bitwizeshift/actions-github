@@ -1,7 +1,7 @@
 name: Create commit status
 description: |
   A composite action that creates a commit status in the repository.
-  Requires the `contents: write` permission to work.
+  Requires the `statuses: write` permission to work.
 
 inputs:
   context:
