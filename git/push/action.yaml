@@ -24,7 +24,7 @@ runs:
       shell: bash
       run: |
         force=""
-        if [${{ inputs.force }} = "true"]; then
+        if ${{ inputs.force }}; then
           force="--force"
         fi
 
