@@ -45,7 +45,6 @@ jobs:
             Source-commit: ${{ github.sha }}
             Github-workflow-id: ${{ github.run_id }}
             Github-workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            Co-authored-by: Matthew Rodusek <bitwizeshift@users.noreply.github.com>
 
       - name: Push generated changes
         if: fromJson(steps.add.outputs.staged)
