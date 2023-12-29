@@ -10,6 +10,11 @@ Below are the list of available actions, with links to documentation:
 
 * [`git/add`](docs/git-add.md)
 * [`git/commit`](docs/git-commit.md)
+* [`git/delete-branch`](docs/git-delete-branch.md)
+* [`git/delete-tag`](docs/git-delete-tag.md)
+* [`git/get-branch`](docs/git-get-branch.md)
+* [`git/get-commit`](docs/git-get-commit.md)
+* [`git/get-tag`](docs/git-get-tag.md)
 * [`git/push`](docs/git-push.md)
 * [`issues/add-assignees`](docs/issues-add-assignees.md)
 * [`issues/add-labels`](docs/issues-add-labels.md)

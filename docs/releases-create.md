@@ -30,6 +30,7 @@ Requires the `contents: write` permission to work.
 |------|-------------|
 | `release-api-url` | The API URL to the release |
 | `release-id` | The ID of the created release |
+| `release-tag` | The release tag used for the release. |
 | `release-url` | The browser URL leading to the release page |
 
 ## Example
@@ -68,5 +69,6 @@ run:
         with:
           use-release-api-url: ${{ steps.releases-create.outputs.release-api-url }}
           use-release-id: ${{ steps.releases-create.outputs.release-id }}
+          use-release-tag: ${{ steps.releases-create.outputs.release-tag }}
           use-release-url: ${{ steps.releases-create.outputs.release-url }}
 ```
