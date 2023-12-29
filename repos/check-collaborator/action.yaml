@@ -1,6 +1,6 @@
-name: Remove a repository collaborator
+name: Check repository collaborator
 description: |
-  A composite action that removes a collaborator from the repository.
+  A composite action that checks if a user is a collaborator with this repository.
   Requires the `contents: write` permission to work.
 
 inputs:
@@ -35,19 +35,25 @@ inputs:
     default: "400,401,403,404,422"
     description: |
       A list of error-codes that are exempt from being retried.
+outputs:
+  is-collaborator:
+    value: ${{ steps.check.outputs.is-collaborator }}
+    description: A boolean indicating whether the user is a collaborator
 
 runs:
   using: "composite"
   steps:
-    - name: Remove collaborator
+    - name: Check collaborator
+      id: check
       uses: actions/github-script@v7
       with:
         retries: ${{ inputs.retries }}
         retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
         github-token: ${{ inputs.github-token }}
         script: |
-          github.rest.repos.removeCollaborator({
+          const result = await github.rest.repos.checkCollaborator({
             owner: `${{ inputs.owner }}` || context.repo.owner,
             repo: `${{ inputs.repo }}` || context.repo.repo,
             username: `${{ inputs.username }}`
           });
+          core.setOutput('is-collaborator', result.status == 204)
