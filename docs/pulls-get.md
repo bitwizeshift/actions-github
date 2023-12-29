@@ -32,6 +32,8 @@ Requires the `pull-requests: read` permission to work.
 | `state` | The state of this PR |
 | `team-reviewers` | The team revieweers for this pull requst, as a JSON array of string logins |
 | `team-reviewers-count` | The number of team reviewers assigned to this pull request |
+| `time-since-create` | The amount of time since the pull request was created |
+| `time-since-last-update` | The amount of time since the pull request was last updated |
 | `title` | The title of this PR |
 | `user-reviewers` | The user reviewers for this pull requst, as a JSON array of string logins |
 | `user-reviewers-count` | The number of user reviewers assigned to this pull request |
@@ -74,6 +76,8 @@ run:
           use-state: ${{ steps.pulls-get.outputs.state }}
           use-team-reviewers: ${{ steps.pulls-get.outputs.team-reviewers }}
           use-team-reviewers-count: ${{ steps.pulls-get.outputs.team-reviewers-count }}
+          use-time-since-create: ${{ steps.pulls-get.outputs.time-since-create }}
+          use-time-since-last-update: ${{ steps.pulls-get.outputs.time-since-last-update }}
           use-title: ${{ steps.pulls-get.outputs.title }}
           use-user-reviewers: ${{ steps.pulls-get.outputs.user-reviewers }}
           use-user-reviewers-count: ${{ steps.pulls-get.outputs.user-reviewers-count }}

@@ -31,6 +31,8 @@ This requires `issues: write` permissions in order to work correctly.
 | `locked` | Whether this issue is currently locked |
 | `state` | The state of the issue |
 | `state-reason` | The reason for the state |
+| `time-since-create` | The amount of time since the issue was created |
+| `time-since-last-update` | The amount of time since the issue was last updated |
 | `title` | The title of the created issue |
 
 ## Example
@@ -70,5 +72,7 @@ run:
           use-locked: ${{ steps.issues-get.outputs.locked }}
           use-state: ${{ steps.issues-get.outputs.state }}
           use-state-reason: ${{ steps.issues-get.outputs.state-reason }}
+          use-time-since-create: ${{ steps.issues-get.outputs.time-since-create }}
+          use-time-since-last-update: ${{ steps.issues-get.outputs.time-since-last-update }}
           use-title: ${{ steps.issues-get.outputs.title }}
 ```
