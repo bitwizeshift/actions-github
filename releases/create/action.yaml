@@ -76,6 +76,9 @@ outputs:
   release-api-url:
     value: ${{ steps.create-release.outputs.release-api-url }}
     description: The API URL to the release
+  release-tag:
+    value: ${{ inputs.tag-name }}
+    description: The release tag used for the release.
 
 runs:
   using: "composite"

@@ -61,3 +61,8 @@ jobs:
         uses: ./releases/delete
         with:
           release-id: ${{ steps.create-release.outputs.release-id }}
+
+      - name: Delete tag
+        uses: ./git/delete-tag
+        with:
+          tag-name: ${{ steps.create-release.outputs.release-tag }}
