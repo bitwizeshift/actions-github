@@ -75,4 +75,3 @@ runs:
           core.setOutput('asset-id', asset.id)
           core.setOutput('asset-url', asset.browser_download_url)
           core.setOutput('asset-api-url', asset.url)
-
