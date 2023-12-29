@@ -82,6 +82,12 @@ outputs:
   locked:
     value: ${{ steps.get-pull.outputs.locked }}
     description: Whether this issue is currently locked
+  time-since-create:
+    value: ${{ steps.get-pull.outputs.time-since-create }}
+    description: The amount of time since the pull request was created
+  time-since-last-update:
+    value: ${{ steps.get-pull.outputs.time-since-last-update }}
+    description: The amount of time since the pull request was last updated
 
 runs:
   using: "composite"
@@ -116,3 +122,15 @@ runs:
           core.setOutput('draft', pull?.draft)
           core.setOutput('merged', pull?.merged)
           core.setOutput('locked', pull?.locked)
+          var timeFromNow = function(date) {
+            const diff = Date.now() - date
+            return {
+              milliseconds : Math.floor(diff           ),
+              seconds      : Math.floor(diff /     1000),
+              minutes      : Math.floor(diff /    60000),
+              hours        : Math.floor(diff /  3600000),
+              days         : Math.floor(diff / 86400000)
+            }
+          }
+          core.setOutput('time-since-create', timeFromNow(Date.parse(pull?.created_at)))
+          core.setOutput('time-since-last-update', timeFromNow(Date.parse(pull?.updated_at)))

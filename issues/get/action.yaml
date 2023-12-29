@@ -73,6 +73,12 @@ outputs:
   locked:
     value: ${{ steps.get-issue.outputs.locked }}
     description: Whether this issue is currently locked
+  time-since-create:
+    value: ${{ steps.get-pull.outputs.time-since-create }}
+    description: The amount of time since the issue was created
+  time-since-last-update:
+    value: ${{ steps.get-pull.outputs.time-since-last-update }}
+    description: The amount of time since the issue was last updated
 
 runs:
   using: "composite"
@@ -102,3 +108,15 @@ runs:
           core.setOutput('state', issue?.state)
           core.setOutput('state-reason', issue?.state_reason)
           core.setOutput('locked', issue?.locked)
+          var timeFromNow = function(date) {
+            const diff = Date.now() - date
+            return {
+              milliseconds : Math.floor(diff           ),
+              seconds      : Math.floor(diff /     1000),
+              minutes      : Math.floor(diff /    60000),
+              hours        : Math.floor(diff /  3600000),
+              days         : Math.floor(diff / 86400000)
+            }
+          }
+          core.setOutput('time-since-create', timeFromNow(Date.parse(issue?.created_at)))
+          core.setOutput('time-since-last-update', timeFromNow(Date.parse(issue?.updated_at)))

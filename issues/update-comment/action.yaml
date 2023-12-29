@@ -45,6 +45,18 @@ outputs:
   comment-url:
     value: ${{ steps.update.outputs.comment-url }}
     description: The URL of the comment that is updated
+  user-login:
+    value: ${{ steps.update.outputs.user-login }}
+    description: The user-login who made the comment
+  body:
+    value: ${{ steps.update.outputs.body }}
+    description: The body of the comment
+  time-since-create:
+    value: ${{ steps.update.outputs.time-since-create }}
+    description: The amount of time since the pull request was created
+  time-since-last-update:
+    value: ${{ steps.update.outputs.time-since-last-update }}
+    description: The amount of time since the pull request was last updated
 
 runs:
   using: "composite"
@@ -65,5 +77,17 @@ runs:
           });
           core.setOutput('comment-id', comment.id)
           core.setOutput('comment-url', comment.html_url)
-
-
+          var timeFromNow = function(date) {
+            const diff = Date.now() - date
+            return {
+              milliseconds : Math.floor(diff           ),
+              seconds      : Math.floor(diff /     1000),
+              minutes      : Math.floor(diff /    60000),
+              hours        : Math.floor(diff /  3600000),
+              days         : Math.floor(diff / 86400000)
+            }
+          }
+          core.setOutput('user-login', timeFromNow(Date.parse(comment?.user?.login)))
+          core.setOutput('body', timeFromNow(Date.parse(comment?.body)))
+          core.setOutput('time-since-create', timeFromNow(Date.parse(comment?.created_at)))
+          core.setOutput('time-since-last-update', timeFromNow(Date.parse(comment?.updated_at)))
