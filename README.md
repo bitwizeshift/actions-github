@@ -44,6 +44,8 @@ Below are the list of available actions, with links to documentation:
 * [`releases/delete-asset`](docs/releases-delete-asset.md)
 * [`releases/get`](docs/releases-get.md)
 * [`releases/upload-asset`](docs/releases-upload-asset.md)
+* [`repos/add-collaborator`](docs/repos-add-collaborator.md)
+* [`repos/remove-collaborator`](docs/repos-remove-collaborator.md)
 
 ## License
 
