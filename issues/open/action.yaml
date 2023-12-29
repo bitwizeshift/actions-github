@@ -1,0 +1,56 @@
+name: Open issue
+description: |
+  A composite action for opening a previously closed issue.
+  This requires `issues: write` permissions in order to work correctly.
+
+inputs:
+  issue-number:
+    required: false
+    default: "0"
+    description: "The issue number to comment on"
+  owner:
+    required: false
+    default: ""
+    description: |
+      The repository owner.
+      If unspecified, this will default to the owner of the current repository.
+  repo:
+    required: false
+    default: ""
+    description: |
+      The name of the repository.
+      If unspecified, this will default to the current repository.
+  github-token:
+    required: false
+    default: "${{ github.token }}"
+    description: |
+      The default token to use for this Git operation.
+      If unspecified, this will default to `github.token`.
+  retries:
+    required: false
+    default: "0"
+    description: |
+      The number of times to attempt to retry if this fails.
+  retry-exempt-status-codes:
+    required: false
+    default: "400,401,403,404,422"
+    description: |
+      A list of error-codes that are exempt from being retried.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Open issue
+      uses: actions/github-script@v7
+      with:
+        retries: ${{ inputs.retries }}
+        retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        github-token: ${{ inputs.github-token }}
+        script: |
+          github.rest.issues.update({
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            issue_number: ${{ inputs.issue-number }} || context.issue.number,
+            state_reason: `reopened`,
+            state: 'open'
+          });
