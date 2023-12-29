@@ -42,6 +42,7 @@ Below are the list of available actions, with links to documentation:
 * [`releases/create`](docs/releases-create.md)
 * [`releases/delete`](docs/releases-delete.md)
 * [`releases/delete-asset`](docs/releases-delete-asset.md)
+* [`releases/get`](docs/releases-get.md)
 * [`releases/upload-asset`](docs/releases-upload-asset.md)
 
 ## License
