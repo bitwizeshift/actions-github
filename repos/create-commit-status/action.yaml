@@ -1,0 +1,90 @@
+name: Create commit status
+description: |
+  A composite action that creates a commit status in the repository.
+  Requires the `contents: write` permission to work.
+
+inputs:
+  context:
+    required: false
+    default: "default"
+    description: |
+      A string label to differentiate this status from the status of other
+      systems. This field is case-insensitive.
+
+      Default: default
+  description:
+    required: false
+    default: ""
+    description: |
+      A short description of the status.
+  state:
+    required: true
+    description: |
+      The state of the status.
+      Can be one of: `error`, `failure`, `pending`, or `success`.
+  target-url:
+    required: false
+    default: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    description: |
+      The target URL to associate with this status. This URL will be linked from
+      the GitHub UI to allow users to easily see the source of the status.
+      For example, if your continuous integration system is posting build status,
+      you would want to provide the deep link for the build output for this
+      specific SHA: http://ci.example.com/user/repo/build/sha
+  sha:
+    required: false
+    default: ${{ github.sha }}
+    description: |
+      The SHA to create a status for.
+      If unspecified, defaults to the SHA of the current event.
+  owner:
+    required: false
+    default: ""
+    description: |
+      The repository owner.
+      If unspecified, this will default to the owner of the current repository.
+  repo:
+    required: false
+    default: ""
+    description: |
+      The name of the repository.
+      If unspecified, this will default to the current repository.
+  github-token:
+    required: false
+    default: "${{ github.token }}"
+    description: |
+      The default token to use for this Git operation.
+      If unspecified, this will default to `github.token`.
+  retries:
+    required: false
+    default: "0"
+    description: |
+      The number of times to attempt to retry if this fails.
+  retry-exempt-status-codes:
+    required: false
+    default: "400,401,403,404,422"
+    description: |
+      A list of error-codes that are exempt from being retried.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Remove collaborator
+      uses: actions/github-script@v7
+      env:
+        DESCRIPTION: ${{ inputs.description }}
+        CONTEXT: ${{ inputs.context }}
+      with:
+        retries: ${{ inputs.retries }}
+        retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
+        github-token: ${{ inputs.github-token }}
+        script: |
+          github.rest.repos.createCommitStatus({
+            owner: `${{ inputs.owner }}` || context.repo.owner,
+            repo: `${{ inputs.repo }}` || context.repo.repo,
+            sha: `${{ inputs.sha }}`,
+            state: `${{ inputs.state }}`,
+            target_url: `${{ inputs.target-url }}`,
+            description: process.env.DESCRIPTION,
+            context: process.env.CONTEXT
+          });
