@@ -1,0 +1,20 @@
+name: Create a git branch
+description: |
+  A composite action for creating a new git branch.
+
+inputs:
+  branch:
+    required: true
+    description: "The name of the branch to create"
+outputs:
+  branch:
+    value: ${{ inputs.branch }}
+    description: The created branch name
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create branch
+      id: commit
+      shell: bash
+      run: git checkout -b '${{ inputs.branch }}'
