@@ -103,7 +103,7 @@ runs:
           const { data: pull } = await github.rest.pulls.get({
             owner: `${{ inputs.owner }}` || context.repo.owner,
             repo: `${{ inputs.repo }}` || context.repo.repo,
-            issue_number: ${{ inputs.pull-number }} || context.issue.number,
+            pull_number: ${{ inputs.pull-number }} || context.issue.number,
           })
           core.setOutput('pull-number', pull?.number)
           core.setOutput('pull-api-url', pull.url)

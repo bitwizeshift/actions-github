@@ -89,10 +89,55 @@ inputs:
 outputs:
   pull-number:
     value: ${{ steps.create.outputs.pull-number }}
-    description: "The number of the created pull request number"
-  pull-url:
-    value: ${{ steps.create.outputs.pull-url }}
-    description: "The HTTP URL of the newly created pull request"
+    description: The pull request number
+  assignees:
+    value: ${{ steps.create.outputs.assignees }}
+    description: The assignee(s) for this pull requst, as a JSON array of string logins
+  assignees-count:
+    value: ${{ steps.create.outputs.assignees }}
+    description: The number of assignee(s) for this pull requst
+  user-reviewers:
+    value: ${{ steps.create.outputs.user-reviewers }}
+    description: The user reviewers for this pull requst, as a JSON array of string logins
+  user-reviewers-count:
+    value: ${{ steps.create.outputs.user-reviewers-count }}
+    description: The number of user reviewers assigned to this pull request
+  team-reviewers:
+    value: ${{ steps.create.outputs.team-reviewers }}
+    description: The team revieweers for this pull requst, as a JSON array of string logins
+  team-reviewers-count:
+    value: ${{ steps.create.outputs.team-reviewers-count }}
+    description: The number of team reviewers assigned to this pull request
+  labels:
+    value: ${{ steps.create.outputs.labels }}
+    description: The labels assigned to this PR, as a JSON array of label names
+  labels-count:
+    value: ${{ steps.create.outputs.labels }}
+    description: The number of labels assigned to this PR
+  title:
+    value: ${{ steps.create.outputs.title }}
+    description: The title of this PR
+  body:
+    value: ${{ steps.create.outputs.body }}
+    description: The body of this PR
+  state:
+    value: ${{ steps.create.outputs.state }}
+    description: The state of this PR
+  draft:
+    value: ${{ steps.create.outputs.draft }}
+    description: Whether the PR is a draft PR
+  merged:
+    value: ${{ steps.create.outputs.merged }}
+    description: Whether the PR is merged.
+  locked:
+    value: ${{ steps.create.outputs.locked }}
+    description: Whether this issue is currently locked
+  time-since-create:
+    value: ${{ steps.create.outputs.time-since-create }}
+    description: The amount of time since the pull request was created
+  time-since-last-update:
+    value: ${{ steps.create.outputs.time-since-last-update }}
+    description: The amount of time since the pull request was last updated
 
 runs:
   using: "composite"
@@ -108,7 +153,7 @@ runs:
         retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
         github-token: ${{ inputs.github-token }}
         script: |
-          const { data: pull } = await github.rest.issues.create({
+          const { data: pull } = await github.rest.pulls.create({
             owner: `${{ inputs.owner }}` || context.repo.owner,
             repo: `${{ inputs.repo }}` || context.repo.repo,
             labels: `${{ inputs.labels }}`.split(/[\n,]/).map(s => s.trim()).filter(s => s),
@@ -117,7 +162,7 @@ runs:
             body: process.env.PR_BODY,
             head: `${{ inputs.head }}`,
             base: `${{ inputs.base }}`,
-            head_repo: `${{ inputs.head-repo}}` || undefined,
+            head_repo: `${{ inputs.head-repo }}` || undefined,
             draft: ${{ inputs.draft }},
             issue: ${{ inputs.issue }} || undefined,
             maintainer_can_modify: ${{ inputs.maintainer-can-modify }},
