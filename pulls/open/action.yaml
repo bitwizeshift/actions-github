@@ -36,11 +36,64 @@ inputs:
     default: "400,401,403,404,422"
     description: |
       A list of error-codes that are exempt from being retried.
+outputs:
+  pull-number:
+    value: ${{ steps.open.outputs.pull-number }}
+    description: The pull request number
+  assignees:
+    value: ${{ steps.open.outputs.assignees }}
+    description: The assignee(s) for this pull requst, as a JSON array of string logins
+  assignees-count:
+    value: ${{ steps.open.outputs.assignees }}
+    description: The number of assignee(s) for this pull requst
+  user-reviewers:
+    value: ${{ steps.open.outputs.user-reviewers }}
+    description: The user reviewers for this pull requst, as a JSON array of string logins
+  user-reviewers-count:
+    value: ${{ steps.open.outputs.user-reviewers-count }}
+    description: The number of user reviewers assigned to this pull request
+  team-reviewers:
+    value: ${{ steps.open.outputs.team-reviewers }}
+    description: The team revieweers for this pull requst, as a JSON array of string logins
+  team-reviewers-count:
+    value: ${{ steps.open.outputs.team-reviewers-count }}
+    description: The number of team reviewers assigned to this pull request
+  labels:
+    value: ${{ steps.open.outputs.labels }}
+    description: The labels assigned to this PR, as a JSON array of label names
+  labels-count:
+    value: ${{ steps.open.outputs.labels }}
+    description: The number of labels assigned to this PR
+  title:
+    value: ${{ steps.open.outputs.title }}
+    description: The title of this PR
+  body:
+    value: ${{ steps.open.outputs.body }}
+    description: The body of this PR
+  state:
+    value: ${{ steps.open.outputs.state }}
+    description: The state of this PR
+  draft:
+    value: ${{ steps.open.outputs.draft }}
+    description: Whether the PR is a draft PR
+  merged:
+    value: ${{ steps.open.outputs.merged }}
+    description: Whether the PR is merged.
+  locked:
+    value: ${{ steps.open.outputs.locked }}
+    description: Whether this issue is currently locked
+  time-since-create:
+    value: ${{ steps.open.outputs.time-since-create }}
+    description: The amount of time since the pull request was created
+  time-since-last-update:
+    value: ${{ steps.open.outputs.time-since-last-update }}
+    description: The amount of time since the pull request was last updated
 
 runs:
   using: "composite"
   steps:
     - name: Open pull request
+      id: open
       uses: actions/github-script@v7
       with:
         retries: ${{ inputs.retries }}
@@ -53,3 +106,32 @@ runs:
             pull_number: ${{ inputs.pull-number }} || context.issue.number,
             state: 'open'
           });
+          core.setOutput('pull-number', pull?.number)
+          core.setOutput('pull-api-url', pull.url)
+          core.setOutput('pull-url', pull.html_url)
+          core.setOutput('assignees', pull?.assignees?.map(v => v.login))
+          core.setOutput('assignees-count', pull?.assignees?.length)
+          core.setOutput('user-reviewers', pull?.requested_reviewers?.map(v => v.login))
+          core.setOutput('user-reviewers-count', pull?.requested_reviewers?.length)
+          core.setOutput('team-reviewers', pull?.requested_teams?.map(v => v.login))
+          core.setOutput('team-reviewers-count', pull?.requested_teams?.length)
+          core.setOutput('labels', pull?.labels?.map(v => v.name))
+          core.setOutput('labels-count', pull?.labels?.length)
+          core.setOutput('title', pull?.title)
+          core.setOutput('body', pull?.body)
+          core.setOutput('state', pull?.state)
+          core.setOutput('draft', pull?.draft)
+          core.setOutput('merged', pull?.merged)
+          core.setOutput('locked', pull?.locked)
+          var timeFromNow = function(date) {
+            const diff = Date.now() - date
+            return {
+              milliseconds : Math.floor(diff           ),
+              seconds      : Math.floor(diff /     1000),
+              minutes      : Math.floor(diff /    60000),
+              hours        : Math.floor(diff /  3600000),
+              days         : Math.floor(diff / 86400000)
+            }
+          }
+          core.setOutput('time-since-create', timeFromNow(Date.parse(pull?.created_at)))
+          core.setOutput('time-since-last-update', timeFromNow(Date.parse(pull?.updated_at)))
