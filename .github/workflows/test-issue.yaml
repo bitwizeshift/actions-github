@@ -1,0 +1,336 @@
+name: Test Issues API
+on:
+  workflow_call:
+    outputs:
+      issue-number:
+        value: ${{ jobs.create.outputs.issue-number }}
+        description: The number for the created issue, used for cleanup
+jobs:
+  create:
+    name: Create
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    outputs:
+      issue-number: ${{ steps.create.outputs.issue-number }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create Issue
+        id: create
+        uses: ./issues/create
+        with:
+          title: "Integration Test ${{ github.run_id }}"
+          body: |
+            This is a test Github Issue initiated by [this workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            Please ignore this
+
+  test-labels:
+    name: Labels
+    needs: [create]
+    runs-on: ubuntu-latest
+    env:
+      LABEL: integration-test
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Issue Before
+        id: before
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert label is not on issue before action
+        if: success() && contains(steps.before.outputs.labels, env.LABEL)
+        run: |
+          echo "::error::Issue labels before was '${{ steps.before.outputs.labels }}'; expected empty"
+          exit 1
+
+      - name: Add label
+        uses: ./issues/add-labels
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+          labels: |
+            ${{ env.LABEL }}
+
+      - name: Get Issue during
+        id: during
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert labels is added after action
+        if: success() && !contains(steps.during.outputs.labels, env.LABEL)
+        run: |
+          echo "::error::Issue Labels is '${{ steps.before.outputs.labels }}'; does not contain ${{ env.LABEL }}"
+          exit 1
+
+
+      - name: Remove Label
+        uses: ./issues/remove-labels
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+          labels: |
+            ${{ env.LABEL }}
+
+      - name: Get Issue after
+        id: after
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert labels is removed after action
+        if: success() && contains(steps.before.outputs.labels, env.LABEL)
+        run: |
+          echo "::error::Issue Labels after is '${{ steps.after.outputs.labels }}'; expected empty"
+          exit 1
+
+  test-assignees:
+    name: Assignees
+    needs: [create]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      issues: write
+    env:
+      ASSIGNEE: bitwizeshift
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Issue Before
+        id: before
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert assignee is does not contain assignee before action
+        if: success() && contains(steps.before.outputs.assignees, env.ASSIGNEE)
+        run: |
+          echo "::error::Issue Assignees before was '${{ steps.before.outputs.assignees }}'; expected empty (size: '${{ steps.before.outputs.assignees-count }}')"
+          exit 1
+
+      - name: Add assignees
+        uses: ./issues/add-assignees
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+          assignees: |
+            ${{ env.ASSIGNEE }}
+
+      - name: Get Issue during
+        id: during
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert assignee is added after action
+        if: success() && !contains(steps.during.outputs.assignees, env.ASSIGNEE)
+        run: |
+          echo "::error::Issue Assignees is '${{ steps.before.outputs.assignees }}'; does not contain ${{ env.ASSIGNEE }}"
+          exit 1
+
+      - name: Remove Assignees
+        uses: ./issues/remove-assignees
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+          assignees: |
+            ${{ env.ASSIGNEE }}
+
+      - name: Get Issue after
+        id: after
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert assignee is removed after action
+        if: success() && contains(steps.after.outputs.assignees, env.ASSIGNEE)
+        run: |
+          echo "::error::Issue Assignees after is '${{ steps.after.outputs.assignees }}'; expected empty"
+          exit 1
+
+  test-lock-unlock:
+    name: Lock/Unlock
+    # Locking/Unlocking needs to be synchronized to prevent race-conditions,
+    # since changes can't be made to locked pull-requests
+    needs:
+      - create
+      - test-assignees
+      - test-comment
+      - test-labels
+      - test-open-close
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Issue Before
+        id: before
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert Issue is unlocked before
+        if: success() && fromJson(steps.before.outputs.locked) != false
+        run: |
+          echo "::error::Issue was not unlocked. Got 'locked = ${{ steps.before.outputs.locked }}'"
+          exit 1
+
+      - name: Lock Issue
+        uses: ./issues/lock
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Get Issue during
+        id: during
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert Issue is locked by action
+        if: success() && fromJson(steps.during.outputs.locked) == false
+        run: |
+          echo "::error::Issue was not locked. Got 'locked = ${{ steps.before.outputs.locked }}'"
+          exit 1
+
+      - name: Unlock Issue
+        uses: ./issues/unlock
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Get Issue after
+        id: after
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert Issue is unlocked by action
+        if: success() && fromJson(steps.after.outputs.locked) != false
+        run: |
+          echo "::error::Issue was not unlocked. Got 'locked = ${{ steps.after.outputs.locked }}'"
+          exit 1
+
+
+  test-open-close:
+    name: Open/Close
+    needs: [create]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Issue Before
+        id: before
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert Issue begins in open state
+        if: success() && steps.before.outputs.state != 'open'
+        run: |
+          echo "::error::Issue State before was not 'open'. Got '${{ steps.before.outputs.state }}'"
+          exit 1
+
+      - name: Close Issue
+        uses: ./issues/close
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Get Issue during
+        id: during
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert Issue is closed by action
+        if: success() && steps.during.outputs.state != 'closed'
+        run: |
+          echo "::error::Issue State during was not 'closed'. Got '${{ steps.during.outputs.state }}'"
+          exit 1
+
+      - name: Reopen Issue
+        uses: ./issues/open
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Get Issue after
+        id: after
+        uses: ./issues/get
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+
+      - name: Assert Issue is reopened by action
+        if: success() && steps.after.outputs.state != 'open'
+        run: |
+          echo "::error::Issue State after was not 'open'. Got '${{ steps.after.outputs.state }}'"
+          exit 1
+
+
+  test-comment:
+    name: Comment
+    needs: [create]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create comment
+        id: create-comment
+        uses: ./issues/create-comment
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}
+          body: |
+            Testing creating an automated comment on the issue
+      - name: Update comment
+        uses: ./issues/update-comment
+        with:
+          comment-id: ${{ steps.create-comment.outputs.comment-id }}
+          body: |
+            Testing creating an automated comment on the issue
+
+            This comment's url: ${{ steps.create-comment.outputs.comment-url }}
+
+  on-completion:
+    name: Close Issue
+    runs-on: ubuntu-latest
+    needs:
+      - create
+      - test-assignees
+      - test-comment
+      - test-labels
+      - test-lock-unlock
+      - test-open-close
+    if: always()
+    permissions:
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Close Issue
+        uses: ./issues/close
+        with:
+          issue-number: ${{ needs.create.outputs.issue-number }}

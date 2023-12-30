@@ -1,0 +1,78 @@
+name: Promote `develop` to `master`
+on:
+  push:
+    branches: develop
+
+jobs:
+  setup:
+    name: Setup Tests
+    permissions:
+      contents: write
+    uses: ./.github/workflows/test-prepare.yaml
+
+  test-pull-requests:
+    name: Test Pull Requests
+    needs: [setup]
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: write
+    uses: ./.github/workflows/test-pull-request.yaml
+    with:
+      branch: ${{ needs.setup.outputs.branch }}
+      base: ${{ needs.setup.outputs.target-branch }}
+
+  test-issues:
+    name: Test Issues
+    needs: [setup]
+    permissions:
+      issues: write
+    uses: ./.github/workflows/test-issue.yaml
+
+  test-releases:
+    name: Test Releases
+    needs: [setup]
+    permissions:
+      contents: write
+    uses: ./.github/workflows/test-release.yaml
+    with:
+      branch: ${{ needs.setup.outputs.branch }}
+
+  promote:
+    name: Promote to master
+    needs:
+      - setup
+      - test-pull-requests
+      - test-issues
+      - test-releases
+    if: success()
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    secrets: inherit
+    uses: ./.github/workflows/test-success.yaml
+    with:
+      branch: ${{ needs.setup.outputs.branch }}
+
+  cleanup:
+    name: Cleanup
+    needs:
+      - setup
+      - test-pull-requests
+      - test-issues
+      - test-releases
+      - promote
+    if: always()
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    uses: ./.github/workflows/test-cleanup.yaml
+    with:
+      branch: ${{ needs.setup.outputs.branch }}
+      target-branch: ${{ needs.setup.outputs.target-branch }}
+      issue-number: ${{ needs.test-issues.outputs.issue-number }}
+      pull-number: ${{ needs.test-pull-requests.outputs.pull-number }}
+      release-id: ${{ needs.test-releases.outputs.release-id }}
+      release-tag: ${{ needs.test-releases.outputs.release-tag }}
