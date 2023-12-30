@@ -1,0 +1,27 @@
+name: Cleanup tests
+on:
+  workflow_call:
+    inputs:
+      branch:
+        description: The name of the branch being used for testing
+        required: true
+        type: string
+
+jobs:
+  test:
+    name: Cleanup tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Delete branch
+        id: before
+        uses: ./git/delete-branch
+        with:
+          branch: ${{ inputs.branch }}
