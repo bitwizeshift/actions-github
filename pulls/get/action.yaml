@@ -106,8 +106,8 @@ runs:
             issue_number: ${{ inputs.pull-number }} || context.issue.number,
           })
           core.setOutput('pull-number', pull?.number)
-          core.setOutput('pull-api-url', issue.url)
-          core.setOutput('pull-url', issue.html_url)
+          core.setOutput('pull-api-url', pull.url)
+          core.setOutput('pull-url', pull.html_url)
           core.setOutput('assignees', pull?.assignees?.map(v => v.login))
           core.setOutput('assignees-count', pull?.assignees?.length)
           core.setOutput('user-reviewers', pull?.requested_reviewers?.map(v => v.login))
