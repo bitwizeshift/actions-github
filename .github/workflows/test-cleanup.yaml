@@ -1,0 +1,79 @@
+name: Cleanup tests
+on:
+  workflow_call:
+    inputs:
+      branch:
+        description: The name of the branch being used for testing
+        required: true
+        type: string
+      target-branch:
+        description: The name of the branch being targeted for the pull request
+        required: true
+        type: string
+      pull-number:
+        description: The number of the pull request
+        required: true
+        type: string
+      issue-number:
+        description: The number of the issue request
+        required: true
+        type: string
+      release-id:
+        description: The release ID
+        required: true
+        type: string
+      release-tag:
+        description: The release tag
+        required: true
+        type: string
+
+jobs:
+  test:
+    name: Cleanup tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Delete Source branch
+        uses: ./git/delete-branch
+        continue-on-error: true
+        with:
+          branch: ${{ inputs.branch }}
+
+      - name: Delete Target branch
+        uses: ./git/delete-branch
+        continue-on-error: true
+        with:
+          branch: ${{ inputs.target-branch }}
+
+      - name: Close Pull Request
+        uses: ./pulls/close
+        continue-on-error: true
+        with:
+          pull-number: ${{ inputs.pull-number }}
+
+      - name: Close Issue
+        uses: ./issues/close
+        continue-on-error: true
+        with:
+          issue-number: ${{ inputs.issue-number }}
+
+      - name: Delete release
+        continue-on-error: true
+        uses: ./releases/delete
+        with:
+          release-id: ${{ inputs.release-id }}
+
+      - name: Delete tag
+        continue-on-error: true
+        uses: ./git/delete-tag
+        with:
+          tag-name: ${{ inputs.release-tag }}
