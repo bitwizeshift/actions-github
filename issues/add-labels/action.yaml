@@ -50,7 +50,7 @@ runs:
         retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
         github-token: ${{ inputs.github-token }}
         script: |
-          github.rest.issues.addLabels({
+          await github.rest.issues.addLabels({
             owner: `${{ inputs.owner }}` || context.repo.owner,
             repo: `${{ inputs.repo }}` || context.repo.repo,
             issue_number: ${{ inputs.issue-number }} || context.issue.number,
