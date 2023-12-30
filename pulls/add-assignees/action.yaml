@@ -4,9 +4,9 @@ description: |
   This requires `pull-requests: write` permissions in order to work correctly.
 
 inputs:
-  labels:
+  assignees:
     required: true
-    description: "A list of labels to add, separated by newlines."
+    description: "A list of assignees to add, separated by newlines."
   pull-number:
     required: false
     default: "0"
