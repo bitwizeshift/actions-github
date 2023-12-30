@@ -1,29 +1,37 @@
 name: Generate documentation
 on:
-  push:
-    branches: master
+  workflow_call:
+    outputs:
+      branch:
+        value: ${{ jobs.create.outputs.branch }}
+        description: The name of the created Branch
 
 jobs:
-  build:
-    name: Generate documentation
+  create:
+    name: Create and push branch
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     permissions:
       contents: write
+    outputs:
+      branch: ${{ steps.create-branch.outputs.branch }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.WORKFLOW_GIT_ACCESS_TOKEN }}
-          fetch-depth: 0
 
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: '>=1.21.0'
+
+      - name: Create new branch
+        id: create-branch
+        uses: ./git/create-branch
+        with:
+          branch: promote/workflow-${{ github.run_id }}
 
       - name: Generate documentation
         run: |
@@ -47,8 +55,6 @@ jobs:
             Github-workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Push generated changes
-        if: fromJson(steps.add.outputs.staged)
         uses: ./git/push
         with:
-          branch: master
-
+          branch: ${{ steps.create-branch.outputs.branch }}
