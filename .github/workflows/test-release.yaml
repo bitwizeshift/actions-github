@@ -1,68 +1,80 @@
-name: Test Release
+name: Test Release API
 on:
-  push:
-    branches: master
-  workflow_dispatch:
-
-
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        required: true
+        description: The name of the branch
+    outputs:
+      release-id:
+        value: ${{ jobs.create.outputs.release-id }}
+        description: The created release ID
+      release-tag:
+        value: ${{ jobs.create.outputs.release-tag }}
+        description: The created release tag
 jobs:
-  build:
-    name: Test issues API
+  create:
+    name: Create
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
     permissions:
       contents: write
-
+    outputs:
+      release-id: ${{ steps.create.outputs.release-id }}
+      release-tag: ${{ steps.create.outputs.release-tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Create release
-        id: create-release
+        id: create
         uses: ./releases/create
         with:
-          name: "Workflow '${{ github.workflow }}' run ${{ github.run_id }}"
+          name: "Workflow run ${{ github.run_id }}"
           body: |
             This is a test Github release initiated by [this workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
             Please ignore this
           tag-name: test-${{ github.run_id }}
+          target-commitish: ${{ inputs.branch }}
+
+  test-assets:
+    name: Assets
+    needs: [create]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Create artifacts
         run: |
           mkdir -p artifacts
           echo "Hello world" >> artifacts/greeting.txt
-          echo "Goodbye world" >> artifacts/farewell.txt
           cp docs/osi-approved-300x350.png artifacts/image.png
 
       - name: Attach greeting.txt to release
+        id: greeting
         uses: ./releases/upload-asset
         with:
-          release-id: ${{ steps.create-release.outputs.release-id }}
+          release-id: ${{ needs.create.outputs.release-id }}
           path: artifacts/greeting.txt
           name: greeting.txt
 
-      - name: Attach farewell.txt to release
-        uses: ./releases/upload-asset
-        with:
-          release-id: ${{ steps.create-release.outputs.release-id }}
-          path: artifacts/farewell.txt
-          name: farewell.txt
-
       - name: Attach image to release
+        id: image
         uses: ./releases/upload-asset
         with:
-          release-id: ${{ steps.create-release.outputs.release-id }}
+          release-id: ${{ needs.create.outputs.release-id }}
           path: artifacts/image.png
           name: image.png
 
-      - name: Delete release
-        uses: ./releases/delete
+      - name: Remove greeting.txt from release
+        uses: ./releases/delete-asset
         with:
-          release-id: ${{ steps.create-release.outputs.release-id }}
+          asset-id: ${{ steps.greeting.outputs.asset-id }}
 
-      - name: Delete tag
-        uses: ./git/delete-tag
+      - name: Attach image to release
+        uses: ./releases/delete-asset
         with:
-          tag-name: ${{ steps.create-release.outputs.release-tag }}
+          asset-id: ${{ steps.image.outputs.asset-id }}
