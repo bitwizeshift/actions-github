@@ -51,7 +51,7 @@ runs:
         retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
         github-token: ${{ inputs.github-token }}
         script: |
-          github.rest.repos.deleteRelease({
+          await github.rest.repos.deleteRelease({
             owner: `${{ inputs.owner }}` || context.repo.owner,
             repo: `${{ inputs.repo }}` || context.repo.repo,
             release_id: `${{ inputs.release-id }}`,

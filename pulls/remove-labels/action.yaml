@@ -51,7 +51,7 @@ runs:
         github-token: ${{ inputs.github-token }}
         script: |
           for (const label of `${{ inputs.labels }}`.split(/[\n,]/).map(s => s.trim()).filter(s => s)) {
-            github.rest.issues.removeLabel({
+            await github.rest.issues.removeLabel({
               owner: `${{ inputs.owner }}` || context.repo.owner,
               repo: `${{ inputs.repo }}` || context.repo.repo,
               issue_number: ${{ inputs.pull-number }} || context.issue.number,

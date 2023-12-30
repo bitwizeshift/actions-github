@@ -46,7 +46,7 @@ runs:
         retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
         github-token: ${{ inputs.github-token }}
         script: |
-          github.rest.repos.removeCollaborator({
+          await github.rest.repos.removeCollaborator({
             owner: `${{ inputs.owner }}` || context.repo.owner,
             repo: `${{ inputs.repo }}` || context.repo.repo,
             username: `${{ inputs.username }}`
