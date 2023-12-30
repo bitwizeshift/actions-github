@@ -1,0 +1,28 @@
+name: Merge Pull Request
+on:
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        required: true
+        description: The name of the branch
+
+jobs:
+  promote-to-master:
+    name: Promote to Master
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Push to Master
+        uses: ./git/push
+        with:
+          branch: master
+          target-commitish: ${{ inputs.branch }}
