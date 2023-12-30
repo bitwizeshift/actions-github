@@ -1,0 +1,68 @@
+name: Promote `develop` to `master`
+on:
+  push:
+    branches: develop
+
+jobs:
+  setup:
+    name: Setup Tests
+    permissions:
+      contents: write
+    uses: ./.github/workflows/test-prepare.yaml
+
+  test-pull-requests:
+    name: Test Pull Requests
+    needs: [setup]
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: write
+    uses: ./.github/workflows/test-pull-request.yaml
+    with:
+      branch: ${{ needs.setup.outputs.branch }}
+
+  test-issues:
+    name: Test Issues
+    needs: [setup]
+    permissions:
+      issues: write
+    uses: ./.github/workflows/test-issue.yaml
+
+  test-releases:
+    name: Test Releases
+    needs: [setup]
+    permissions:
+      contents: write
+    uses: ./.github/workflows/test-release.yaml
+    with:
+      branch: ${{ needs.setup.outputs.branch }}
+
+  on-success:
+    name: Success
+    needs:
+      - setup
+      - test-pull-requests
+      - test-issues
+      - test-releases
+    if: success()
+    permissions:
+      pull-requests: write
+      contents: write
+    uses: ./.github/workflows/test-success.yaml
+    with:
+      pull-number: ${{ needs.test-pull-requests.outputs.pull-number }}
+
+  on-failure:
+    name: Failure
+    needs:
+      - setup
+      - test-pull-requests
+      - test-issues
+      - test-releases
+      - on-success
+    if: failure()
+    permissions:
+      contents: write
+    uses: ./.github/workflows/test-failure.yaml
+    with:
+      branch: ${{ needs.setup.outputs.branch }}
