@@ -100,7 +100,7 @@ runs:
         retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
         github-token: ${{ inputs.github-token }}
         script: |
-          await github.rest.pulls.update({
+          const { data: pull } = await github.rest.pulls.update({
             owner: `${{ inputs.owner }}` || context.repo.owner,
             repo: `${{ inputs.repo }}` || context.repo.repo,
             pull_number: ${{ inputs.pull-number }} || context.issue.number,
