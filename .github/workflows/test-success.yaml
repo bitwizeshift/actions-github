@@ -1,0 +1,27 @@
+name: Merge Pull Request
+on:
+  workflow_call:
+    inputs:
+      pull-number:
+        description: The PR Number to test with
+        required: true
+        type: string
+
+jobs:
+  test:
+    name: Merge Pull Request
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Merge pull request
+        uses: ./pulls/merge
+        with:
+          pull-number: ${{ inputs.pull-number }}
+          strategy: rebase
