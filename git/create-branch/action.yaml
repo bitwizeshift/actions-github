@@ -6,10 +6,21 @@ inputs:
   branch:
     required: true
     description: "The name of the branch to create"
+  target-commitish:
+    required: false
+    default: HEAD
+    description: "The commitish to create the branch from"
+  checkout:
+    required: false
+    default: "true"
+    description: "Whether to automatically checkout this branch"
+
 outputs:
   branch:
     value: ${{ inputs.branch }}
-    description: The created branch name
+    description: |
+      The commitish that refers where the branch is from.
+      By default, this will refer to the current `HEAD`.
 
 runs:
   using: "composite"
@@ -17,4 +28,9 @@ runs:
     - name: Create branch
       id: commit
       shell: bash
-      run: git checkout -b '${{ inputs.branch }}'
+      run: git branch '${{ inputs.branch }}' '${{ inputs.target-commitish }}'
+
+    - name: Checkout branch
+      if: success() && fromJson(inputs.checkout)
+      shell: bash
+      run: git checkout ${{ inputs.branch }}

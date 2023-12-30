@@ -1,0 +1,81 @@
+name: Generate documentation
+on:
+  workflow_call:
+    outputs:
+      branch:
+        value: ${{ jobs.create.outputs.branch }}
+        description: The name of the created Branch
+      target-branch:
+        value: ${{ jobs.create.outputs.target-branch }}
+        description: The name of the branch to target
+
+jobs:
+  create:
+    name: Create and push branch
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      contents: write
+    outputs:
+      branch: ${{ steps.create-branch.outputs.branch }}
+      target-branch: ${{ steps.create-branch-target.outputs.branch }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '>=1.21.0'
+
+      - name: Fetch master branch
+        run: git fetch origin master
+
+      - name: Create new branch target
+        id: create-branch-target
+        uses: ./git/create-branch
+        with:
+          target-commitish: origin/master
+          branch: promote/workflow-${{ github.run_id }}-target
+          checkout: false
+
+      - name: Push empty target branch
+        uses: ./git/push
+        with:
+          branch: ${{ steps.create-branch-target.outputs.branch }}
+
+      - name: Create new source branch
+        id: create-branch
+        uses: ./git/create-branch
+        with:
+          branch: promote/workflow-${{ github.run_id }}
+          checkout: true
+
+      - name: Generate documentation
+        run: |
+          rm docs/*.md
+          go run ./tools/generate-docs
+
+      - name: Add changes
+        id: add
+        uses: ./git/add
+
+      - name: Commit changes
+        if: fromJson(steps.add.outputs.staged)
+        uses: ./git/commit
+        with:
+          title: 📄 Update generated documentation
+          body: |
+            This commits the output of the `generate-docs` tool.
+
+            Source-commit: ${{ github.sha }}
+            Github-workflow-id: ${{ github.run_id }}
+            Github-workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Push generated changes
+        uses: ./git/push
+        with:
+          branch: ${{ steps.create-branch.outputs.branch }}
