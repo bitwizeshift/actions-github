@@ -20,7 +20,23 @@ This requires `pulls: write` permissions in order to work correctly.
 
 | Name | Description |
 |------|-------------|
-| `pull-number` | The pull request number that was closed |
+| `assignees` | The assignee(s) for this pull requst, as a JSON array of string logins |
+| `assignees-count` | The number of assignee(s) for this pull requst |
+| `body` | The body of this PR |
+| `draft` | Whether the PR is a draft PR |
+| `labels` | The labels assigned to this PR, as a JSON array of label names |
+| `labels-count` | The number of labels assigned to this PR |
+| `locked` | Whether this issue is currently locked |
+| `merged` | Whether the PR is merged. |
+| `pull-number` | The pull request number |
+| `state` | The state of this PR |
+| `team-reviewers` | The team revieweers for this pull requst, as a JSON array of string logins |
+| `team-reviewers-count` | The number of team reviewers assigned to this pull request |
+| `time-since-create` | The amount of time since the pull request was created |
+| `time-since-last-update` | The amount of time since the pull request was last updated |
+| `title` | The title of this PR |
+| `user-reviewers` | The user reviewers for this pull requst, as a JSON array of string logins |
+| `user-reviewers-count` | The number of user reviewers assigned to this pull request |
 
 ## Example
 
@@ -34,7 +50,7 @@ run:
     steps:
       # ... 
       - name: Close pull request
-        id: pulls-close # only necessary if using this action's output
+        id: pulls-close # only necessary if using this action's output(s)
         uses: bitwizeshift/actions-github/pulls/close@v1
         with:
           # Optional inputs
@@ -48,5 +64,21 @@ run:
       - name: Uses "Close pull request" Outputs
         uses: example-actions/use-pulls-close@v3 # illustrative
         with:
+          use-assignees: ${{ steps.pulls-close.outputs.assignees }}
+          use-assignees-count: ${{ steps.pulls-close.outputs.assignees-count }}
+          use-body: ${{ steps.pulls-close.outputs.body }}
+          use-draft: ${{ steps.pulls-close.outputs.draft }}
+          use-labels: ${{ steps.pulls-close.outputs.labels }}
+          use-labels-count: ${{ steps.pulls-close.outputs.labels-count }}
+          use-locked: ${{ steps.pulls-close.outputs.locked }}
+          use-merged: ${{ steps.pulls-close.outputs.merged }}
           use-pull-number: ${{ steps.pulls-close.outputs.pull-number }}
+          use-state: ${{ steps.pulls-close.outputs.state }}
+          use-team-reviewers: ${{ steps.pulls-close.outputs.team-reviewers }}
+          use-team-reviewers-count: ${{ steps.pulls-close.outputs.team-reviewers-count }}
+          use-time-since-create: ${{ steps.pulls-close.outputs.time-since-create }}
+          use-time-since-last-update: ${{ steps.pulls-close.outputs.time-since-last-update }}
+          use-title: ${{ steps.pulls-close.outputs.title }}
+          use-user-reviewers: ${{ steps.pulls-close.outputs.user-reviewers }}
+          use-user-reviewers-count: ${{ steps.pulls-close.outputs.user-reviewers-count }}
 ```
