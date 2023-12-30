@@ -45,6 +45,8 @@ Below are the list of available actions, with links to documentation:
 * [`releases/get`](docs/releases-get.md)
 * [`releases/upload-asset`](docs/releases-upload-asset.md)
 * [`repos/add-collaborator`](docs/repos-add-collaborator.md)
+* [`repos/check-collaborator`](docs/repos-check-collaborator.md)
+* [`repos/create-commit-status`](docs/repos-create-commit-status.md)
 * [`repos/remove-collaborator`](docs/repos-remove-collaborator.md)
 
 ## License
