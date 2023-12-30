@@ -151,4 +151,3 @@ runs:
           }
           core.setOutput('time-since-create', timeFromNow(Date.parse(pull?.created_at)))
           core.setOutput('time-since-last-update', timeFromNow(Date.parse(pull?.updated_at)))
-
