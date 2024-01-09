@@ -18,7 +18,25 @@ This requires `pull-requests: write` permissions in order to work correctly.
 
 ## Outputs
 
-`pulls/open` does not have any outputs at this time
+| Name | Description |
+|------|-------------|
+| `assignees` | The assignee(s) for this pull requst, as a JSON array of string logins |
+| `assignees-count` | The number of assignee(s) for this pull requst |
+| `body` | The body of this PR |
+| `draft` | Whether the PR is a draft PR |
+| `labels` | The labels assigned to this PR, as a JSON array of label names |
+| `labels-count` | The number of labels assigned to this PR |
+| `locked` | Whether this issue is currently locked |
+| `merged` | Whether the PR is merged. |
+| `pull-number` | The pull request number |
+| `state` | The state of this PR |
+| `team-reviewers` | The team revieweers for this pull requst, as a JSON array of string logins |
+| `team-reviewers-count` | The number of team reviewers assigned to this pull request |
+| `time-since-create` | The amount of time since the pull request was created |
+| `time-since-last-update` | The amount of time since the pull request was last updated |
+| `title` | The title of this PR |
+| `user-reviewers` | The user reviewers for this pull requst, as a JSON array of string logins |
+| `user-reviewers-count` | The number of user reviewers assigned to this pull request |
 
 ## Example
 
@@ -32,6 +50,7 @@ run:
     steps:
       # ... 
       - name: Open issue
+        id: pulls-open # only necessary if using this action's output(s)
         uses: bitwizeshift/actions-github/pulls/open@v1
         with:
           # Optional inputs
@@ -41,4 +60,25 @@ run:
           repo: REPO
           retries: RETRIES
           retry-exempt-status-codes: RETRY_EXEMPT_STATUS_CODES
+      # ... 
+      - name: Uses "Open issue" Outputs
+        uses: example-actions/use-pulls-open@v3 # illustrative
+        with:
+          use-assignees: ${{ steps.pulls-open.outputs.assignees }}
+          use-assignees-count: ${{ steps.pulls-open.outputs.assignees-count }}
+          use-body: ${{ steps.pulls-open.outputs.body }}
+          use-draft: ${{ steps.pulls-open.outputs.draft }}
+          use-labels: ${{ steps.pulls-open.outputs.labels }}
+          use-labels-count: ${{ steps.pulls-open.outputs.labels-count }}
+          use-locked: ${{ steps.pulls-open.outputs.locked }}
+          use-merged: ${{ steps.pulls-open.outputs.merged }}
+          use-pull-number: ${{ steps.pulls-open.outputs.pull-number }}
+          use-state: ${{ steps.pulls-open.outputs.state }}
+          use-team-reviewers: ${{ steps.pulls-open.outputs.team-reviewers }}
+          use-team-reviewers-count: ${{ steps.pulls-open.outputs.team-reviewers-count }}
+          use-time-since-create: ${{ steps.pulls-open.outputs.time-since-create }}
+          use-time-since-last-update: ${{ steps.pulls-open.outputs.time-since-last-update }}
+          use-title: ${{ steps.pulls-open.outputs.title }}
+          use-user-reviewers: ${{ steps.pulls-open.outputs.user-reviewers }}
+          use-user-reviewers-count: ${{ steps.pulls-open.outputs.user-reviewers-count }}
 ```
