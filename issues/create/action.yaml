@@ -61,6 +61,9 @@ runs:
     - name: Create issue
       id: create
       uses: actions/github-script@v7
+      env:
+        TITLE: ${{ inputs.title }}
+        BODY: ${{ inputs.body }}
       with:
         retries: ${{ inputs.retries }}
         retry-exempt-status-codes: ${{ inputs.retry-exempt-status-codes }}
@@ -71,8 +74,8 @@ runs:
             repo: `${{ inputs.repo }}` || context.repo.repo,
             labels: `${{ inputs.labels }}`.split(/[\n,]/).map(s => s.trim()).filter(s => s),
             assignees: `${{ inputs.assignees }}`.split(/[\n,]/).map(s => s.trim()).filter(s => s),
-            title: `${{ inputs.title }}`,
-            body: `${{ inputs.body }}`,
+            title: process.env.TITLE,
+            body: process.env.BODY,
           })
           core.setOutput('issue-number', issue.number)
           core.setOutput('issue-url', issue.html_url)
