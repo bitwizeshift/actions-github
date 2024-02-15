@@ -4,6 +4,51 @@ on:
     branches: develop
 
 jobs:
+  test:
+    name: Test axios
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test axios
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const axios = require('axios');
+
+            const jiraUrl = 'YOUR_JIRA_URL';
+            const apiKey = 'YOUR_API_KEY';
+            const projectKey = 'PROJECT_KEY';
+            const issueTypeId = '10001'; // Provide the appropriate issue type ID
+            const summary = 'SUMMARY_OF_THE_ISSUE';
+
+            const createIssue = async () => {
+              try {
+                const response = await axios.post(
+                  `${jiraUrl}/rest/api/3/issue`,
+                  {
+                    fields: {
+                      project: {
+                        key: projectKey
+                      },
+                      summary,
+                      issuetype: {
+                        id: issueTypeId
+                      }
+                    }
+                  },
+                  {
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${apiKey}`
+                    }
+                  }
+                );
+
+                console.log('Issue created successfully:', response.data.key);
+              } catch (error) {
+                console.error('Error creating issue:', error.response.data);
+              }
+            };
+
   setup:
     name: Setup Tests
     permissions:
